@@ -1,6 +1,6 @@
 # SPEC 02 — Niños: listado (`/kids`) y perfil (`/kids/[id]`)
 
-> **Estado:** Approved  
+> **Estado:** Implemented  
 > **Depende de:** SPEC 01  
 > **Fecha:** 2026-11-16  
 > **Objetivo:** Implementar las plantillas `references/pantallas/ninos.dc.html` y `references/pantallas/perfil-nino.dc.html` como las rutas `/kids` (listado de niños con búsqueda visual) y `/kids/[id]` (perfil con datos y padres vinculados), reutilizando el layout responsive de SPEC 01, con datos mock estáticos y navegación real solo entre las pantallas ya implementadas.
@@ -87,15 +87,24 @@ Convenciones:
 
 ## Criterios de aceptación
 
-- [ ] `/kids` renderiza sin errores de consola/compilación, con el mismo contenido, orden y chips del mockup (`ninos.dc.html`): 8 cards, MANÍ/LACTOSA (`#FBD8CC`/`#D9684A`), VINCULAR (`#F9D2DE`/`#C56486`) solo en Valentina, chevron en el resto.
-- [ ] Grid de 2 columnas en `>= md` y 1 en `< md`, con hover del mockup en las cards.
-- [ ] Cada card navega a su `/kids/[id]` (ids slug) y “Volver a Niños” regresa a `/kids`.
-- [ ] `/kids/mateo-fernandez` reproduce exactamente el mockup de perfil (avatar, “3 años · Sala Soles”, Editar, caja de alergias con su texto, 12 mar 2022 / Soles / feb 2025, Resumen del día, Lucía ACTIVA, Diego PENDIENTE, “Vincular otro padre”).
-- [ ] Los 8 ids devuelven 200 con perfil completo coherente con la lista; un id inexistente devuelve 404.
-- [ ] Sidebar marca “Niños” activo (`#FBE3D8`/`#D9583C`) en ambas rutas y enlaza a `/kids`; en `/` sigue marcando “Feed” con idéntico aspecto al actual.
-- [ ] El buscador está presente (“Buscar niño…”) y no filtra; sin `fetch`, rutas de API ni datos reales.
-- [ ] Patrón responsive de SPEC 01 operativo en ambas rutas (drawer mobile incluido).
-- [ ] `npx tsc --noEmit` pasa sin errores; capturas de verificación en `.playwright-mcp/`.
+- [x] `/kids` renderiza sin errores de consola/compilación, con el mismo contenido, orden y chips del mockup (`ninos.dc.html`): 8 cards, MANÍ/LACTOSA (`#FBD8CC`/`#D9684A`), VINCULAR (`#F9D2DE`/`#C56486`) solo en Valentina, chevron en el resto.
+  - Evidencia: `.playwright-mcp/verify-02-kids-desktop-active.png` (desktop), `verify-02-kids-mobile-closed.png` (mobile); `browser_console_messages`: 0 errores; `tsc --noEmit` limpio.
+- [x] Grid de 2 columnas en `>= md` y 1 en `< md`, con hover del mockup en las cards.
+  - Evidencia: `.playwright-mcp/verify-02-kids-desktop-active.png` (grid 2 cols desktop), `verify-02-kids-mobile-closed.png` (1 col mobile); `KidCard` hover `hover:border-[#F2A78E] hover:-translate-y-[2px]` en `components/kids/KidCard.tsx:51`.
+- [x] Cada card navega a su `/kids/[id]` (ids slug) y “Volver a Niños” regresa a `/kids`.
+  - Evidencia: `KidCard` `href="/kids/${kid.id}"` (`components/kids/KidCard.tsx:49`); `Link href="/kids"` "Volver a Niños" (`app/kids/[id]/page.tsx:58`); navegación cruzada verificada navegando directamente a `/kids`, `/kids/mateo-fernandez` y comprobando `href="/kids"` del link de retorno.
+- [x] `/kids/mateo-fernandez` reproduce exactamente el mockup de perfil (avatar, “3 años · Sala Soles”, Editar, caja de alergias con su texto, 12 mar 2022 / Soles / feb 2025, Resumen del día, Lucía ACTIVA, Diego PENDIENTE, “Vincular otro padre”).
+  - Evidencia: `.playwright-mcp/verify-02-mateo-desktop.png` y `verify-02-mateo-mobile.png`; `app/_data/kids.ts` Mateo exacto (líneas 46-75); componentes `ProfileHeader`, `AllergyNoteCard`, `ProfileDetailsCard`, `LinkedParentsCard`.
+- [x] Los 8 ids devuelven 200 con perfil completo coherente con la lista; un id inexistente devuelve 404.
+  - Evidencia: `curl` los 8 slugs → 200 (mateo-fernandez, sofia-mendez, benjamin-ruiz, valentina-soto, tomas-diaz, emma-castro, lucas-romero, olivia-vega); `kids/no-existe` → 404 (`.playwright-mcp/verify-02-404.png`); `generateStaticParams` + `notFound()` en `app/kids/[id]/page.tsx`.
+- [x] Sidebar marca “Niños” activo (`#FBE3D8`/`#D9583C`) en ambas rutas y enlaza a `/kids`; en `/` sigue marcando “Feed” con idéntico aspecto al actual.
+  - Evidencia: `.playwright-mcp/verify-02-kids-desktop-active.png` (sidebar Niños activo en /kids), `verify-02-kids-mobile-drawer.png` (drawer mobile Niños activo), `verify-01-home-desktop.png` (Feed activo en /); `Sidebar` prop `activeItem` y `href="/kids"` (`components/layout/Sidebar.tsx:16-20`); `app/page.tsx` pasa `activeItem="feed"`.
+- [x] El buscador está presente (“Buscar niño…”) y no filtra; sin `fetch`, rutas de API ni datos reales.
+  - Evidencia: `KidsSearch` input con placeholder "Buscar niño…" sin `onChange`/filtro (`components/kids/KidsSearch.tsx`); datos estáticos en `app/_data/kids.ts`; `verify-02-kids-desktop-active.png` muestra el input presente.
+- [x] Patrón responsive de SPEC 01 operativo en ambas rutas (drawer mobile incluido).
+  - Evidencia: `MobileMenu` con drawer hamburguesa (`components/layout/MobileMenu.tsx`), `Sidebar` sticky desktop; verificado en `verify-02-kids-mobile-drawer.png` (drawer abierto con Niños activo) y `verify-02-kids-mobile-closed.png`.
+- [x] `npx tsc --noEmit` pasa sin errores; capturas de verificación en `.playwright-mcp/`.
+  - Evidencia: `npx tsc --noEmit` → sin salida (0 errores); capturas en `.playwright-mcp/` (kids desktop/mobile, mateo desktop/mobile, 404, nav cruzada, home).
 
 ## Decisiones
 
