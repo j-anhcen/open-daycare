@@ -18,11 +18,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      <MobileMenu currentUser={currentUser} />
+      <MobileMenu currentUser={currentUser} activeItem="feed" />
 
       <div className="md:flex">
         <Sidebar
           currentUser={currentUser}
+          activeItem="feed"
           className="sticky top-0 hidden h-screen w-[248px] shrink-0 md:flex"
         />
 

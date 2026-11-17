@@ -36,6 +36,35 @@
   --color-activity-badge-bg: #c7e7f1;
   --color-activity-badge-fg: #2e89a6;
 
+  --color-avatar-blue-bg: #a9d9e8;
+  --color-avatar-blue-fg: #1f7a93;
+  --color-avatar-pink-bg: #f4b8cc;
+  --color-avatar-pink-fg: #c44a7a;
+  --color-avatar-green-bg: #b9dec4;
+  --color-avatar-green-fg: #3e8b62;
+  --color-avatar-yellow-bg: #f4dc8e;
+  --color-avatar-yellow-fg: #9a7b1e;
+  --color-avatar-purple-bg: #c9b6e8;
+  --color-avatar-purple-fg: #7b5fc0;
+
+  --color-avatar-solid-blue: #a9c7e8;
+  --color-avatar-solid-purple: #c9b6e8;
+
+  --color-allergy-chip-bg: #fbd8cc;
+  --color-allergy-chip-fg: #d9684a;
+  --color-link-chip-bg: #f9d2de;
+  --color-link-chip-fg: #c56486;
+
+  --color-parent-status-active-bg: #cfebd8;
+  --color-parent-status-active-fg: #3e9b6c;
+  --color-parent-status-pending-bg: #f7e7a6;
+  --color-parent-status-pending-fg: #9a7b1e;
+
+  --color-allergy-box-bg: #fbdad6;
+  --color-allergy-box-icon-bg: #f4a8a0;
+  --color-allergy-box-title: #c5413a;
+  --color-allergy-box-text: #b25249;
+
   --font-sans: var(--font-nunito), system-ui, sans-serif;
   --font-display: var(--font-fredoka), system-ui, sans-serif;
 }

@@ -1,4 +1,5 @@
-import type { FeedPageData } from "@/app/_data/mock";
+import Link from "next/link";
+import type { StaffUser } from "@/app/_data/mock";
 import {
   BellIcon,
   ChildrenIcon,
@@ -9,25 +10,35 @@ import {
   UserIcon,
 } from "@/components/shared/icons";
 
+export type NavItemId = "feed" | "kids" | "notices" | "account";
+
 const navigationItems = [
-  { label: "Feed", href: "#", icon: HomeIcon, active: true },
-  { label: "Niños", href: "#", icon: ChildrenIcon, active: false },
-  { label: "Avisos", href: "#", icon: BellIcon, active: false },
-  { label: "Mi cuenta", href: "#", icon: UserIcon, active: false },
+  { id: "feed", label: "Feed", href: "/", icon: HomeIcon },
+  { id: "kids", label: "Niños", href: "/kids", icon: ChildrenIcon },
+  { id: "notices", label: "Avisos", href: "/avisos", icon: BellIcon },
+  { id: "account", label: "Mi cuenta", href: "/mi-cuenta", icon: UserIcon },
 ];
 
 type SidebarProps = {
-  currentUser: FeedPageData["currentUser"];
+  currentUser: StaffUser;
+  activeItem: NavItemId;
   className?: string;
+  onNavigate?: () => void;
 };
 
-export function Sidebar({ currentUser, className = "" }: SidebarProps) {
+export function Sidebar({
+  currentUser,
+  activeItem,
+  className = "",
+  onNavigate,
+}: SidebarProps) {
   return (
     <aside
       className={`flex flex-col border-r border-line bg-surface px-4 py-6 ${className}`}
     >
-      <a
-        href="#"
+      <Link
+        href="/"
+        onNavigate={onNavigate}
         className="flex items-center gap-[11px] px-2 pt-1 pb-[22px]"
       >
         <span className="flex h-[38px] w-[38px] flex-none items-center justify-center rounded-xl bg-[linear-gradient(155deg,#F8C3A8,#F2937A)]">
@@ -41,34 +52,37 @@ export function Sidebar({ currentUser, className = "" }: SidebarProps) {
             Sala Soles
           </span>
         </span>
-      </a>
+      </Link>
 
-      <a
-        href="#"
+      <Link
+        href="/crear-publicacion"
+        onNavigate={onNavigate}
         className="mb-[18px] flex w-full items-center justify-center gap-2 rounded-[14px] bg-[linear-gradient(180deg,#F4977E,#EE8164)] p-3 text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,0.75)]"
       >
         <PlusIcon className="h-[17px] w-[17px]" />
         Nueva publicación
-      </a>
+      </Link>
 
       <nav className="flex flex-1 flex-col gap-1">
         {navigationItems.map((item) => {
           const Icon = item.icon;
+          const isActive = item.id === activeItem;
+
+          const itemClassName = isActive
+            ? "flex items-center gap-3 rounded-xl bg-accent-soft px-3 py-[11px] text-[14.5px] font-extrabold text-accent-label"
+            : "flex items-center gap-3 rounded-xl px-3 py-[11px] text-[14.5px] font-semibold text-nav-muted";
 
           return (
-            <a
-              key={item.label}
+            <Link
+              key={item.id}
               href={item.href}
-              aria-current={item.active ? "page" : undefined}
-              className={
-                item.active
-                  ? "flex items-center gap-3 rounded-xl bg-accent-soft px-3 py-[11px] text-[14.5px] font-extrabold text-accent-label"
-                  : "flex items-center gap-3 rounded-xl px-3 py-[11px] text-[14.5px] font-semibold text-nav-muted"
-              }
+              onNavigate={onNavigate}
+              aria-current={isActive ? "page" : undefined}
+              className={itemClassName}
             >
               <Icon className="h-[19px] w-[19px]" />
               {item.label}
-            </a>
+            </Link>
           );
         })}
       </nav>
@@ -86,14 +100,15 @@ export function Sidebar({ currentUser, className = "" }: SidebarProps) {
               {currentUser.roleLabel}
             </div>
           </div>
-          <a
-            href="#"
+          <Link
+            href="/login"
+            onNavigate={onNavigate}
             aria-label="Cerrar sesión"
             title="Cerrar sesión"
             className="flex h-8 w-8 flex-none items-center justify-center rounded-[10px] bg-background text-muted"
           >
             <LogoutIcon className="h-4 w-4" />
-          </a>
+          </Link>
         </div>
       </div>
     </aside>
