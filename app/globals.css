@@ -65,6 +65,13 @@
   --color-allergy-box-title: #c5413a;
   --color-allergy-box-text: #b25249;
 
+  --color-auth-background: #fbf4ec;
+  --color-auth-input-border: #eadfd0;
+
+  --color-consent-box-bg: #fbf1d6;
+  --color-consent-box-text: #8a7234;
+  --color-consent-check: #5fb97e;
+
   --font-sans: var(--font-nunito), system-ui, sans-serif;
   --font-display: var(--font-fredoka), system-ui, sans-serif;
 }
