@@ -172,3 +172,11 @@ export function WarningIcon(props: IconProps) {
     </IconBase>
   );
 }
+
+export function CheckIcon(props: IconProps) {
+  return (
+    <IconBase strokeWidth={3} {...props}>
+      <polyline points="20 6 9 17 4 12" />
+    </IconBase>
+  );
+}
