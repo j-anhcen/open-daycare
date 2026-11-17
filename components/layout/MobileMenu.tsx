@@ -1,15 +1,18 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import type { FeedPageData } from "@/app/_data/mock";
+import type { StaffUser } from "@/app/_data/mock";
 import { CloseIcon, MenuIcon, SunIcon } from "@/components/shared/icons";
 import { Sidebar } from "./Sidebar";
+import type { NavItemId } from "./Sidebar";
 
 type MobileMenuProps = {
-  currentUser: FeedPageData["currentUser"];
+  currentUser: StaffUser;
+  activeItem: NavItemId;
 };
 
-export function MobileMenu({ currentUser }: MobileMenuProps) {
+export function MobileMenu({ currentUser, activeItem }: MobileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const close = () => setIsOpen(false);
@@ -48,7 +51,7 @@ export function MobileMenu({ currentUser }: MobileMenuProps) {
         >
           <MenuIcon className="h-5 w-5" />
         </button>
-        <a href="#" className="flex items-center gap-[11px]">
+        <Link href="/" className="flex items-center gap-[11px]">
           <span className="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-[linear-gradient(155deg,#F8C3A8,#F2937A)]">
             <SunIcon className="h-5 w-5 text-white" />
           </span>
@@ -60,7 +63,7 @@ export function MobileMenu({ currentUser }: MobileMenuProps) {
               Sala Soles
             </span>
           </span>
-        </a>
+        </Link>
       </header>
 
       <div
@@ -82,7 +85,12 @@ export function MobileMenu({ currentUser }: MobileMenuProps) {
             isOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
-          <Sidebar currentUser={currentUser} className="h-full w-full" />
+          <Sidebar
+            currentUser={currentUser}
+            activeItem={activeItem}
+            onNavigate={close}
+            className="h-full w-full"
+          />
           <button
             type="button"
             onClick={close}

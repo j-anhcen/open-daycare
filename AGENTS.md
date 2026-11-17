@@ -66,12 +66,6 @@ Daycare staff/family app scaffolded with `create-next-app`. `app/` is still the 
 - Playwright is configured in `opencode.json`; keep all screenshots/artifacts in `.playwright-mcp/`.
 - Context7 is available for current framework/library documentation — prefer it over memory for library APIs.
 
-
-## Spec Driven Development - Skills
-
-- /spec utilizaremos esta habilidad para crear especificaciones. 
-- /spec-impl utilizaremos esta habilidad para implementar las especificaciones.
-
 ## Reglas de código
 
 - Usar código limpio: nombres, variables, funciones, etc. en inglés.

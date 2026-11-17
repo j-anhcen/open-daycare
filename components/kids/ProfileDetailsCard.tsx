@@ -1,0 +1,35 @@
+import type { Kid } from "@/app/_data/kids";
+
+type ProfileDetailsCardProps = {
+  kid: Kid;
+};
+
+function detailRows(kid: Kid): { label: string; value: string }[] {
+  return [
+    { label: "Fecha de nacimiento", value: kid.birthDateLabel },
+    { label: "Sala", value: kid.roomLabel },
+    { label: "Ingreso", value: kid.enrollmentLabel },
+  ];
+}
+
+export function ProfileDetailsCard({ kid }: ProfileDetailsCardProps) {
+  const rows = detailRows(kid);
+
+  return (
+    <div className="overflow-hidden rounded-[16px] border border-line bg-surface">
+      {rows.map((row, index) => (
+        <div
+          key={row.label}
+          className={`flex justify-between px-[18px] py-[15px] ${
+            index < rows.length - 1 ? "border-b border-line-soft" : ""
+          }`}
+        >
+          <span className="text-[14.5px] text-muted">{row.label}</span>
+          <span className="text-[14.5px] font-extrabold text-ink">
+            {row.value}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}

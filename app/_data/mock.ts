@@ -1,5 +1,17 @@
 export type PostType = "achievement" | "activity" | "announcement";
 
+export type StaffUser = {
+  name: string;
+  roleLabel: string;
+  initial: string;
+};
+
+export const currentUser: StaffUser = {
+  name: "Caro Giménez",
+  roleLabel: "Maestra · Soles",
+  initial: "C",
+};
+
 export type FeedPost = {
   id: string;
   type: PostType;
@@ -17,7 +29,7 @@ export type FeedPageData = {
   roomLabel: string;
   greeting: string;
   subtitle: string;
-  currentUser: { name: string; roleLabel: string; initial: string };
+  currentUser: StaffUser;
   composerPlaceholder: string;
   postsSectionLabel: string;
   posts: FeedPost[];
@@ -27,11 +39,7 @@ export const feedPageData: FeedPageData = {
   roomLabel: "GUARDERÍA · SALA SOLES",
   greeting: "Buenas, Caro",
   subtitle: "12 niños · martes 17 jun",
-  currentUser: {
-    name: "Caro Giménez",
-    roleLabel: "Maestra · Soles",
-    initial: "C",
-  },
+  currentUser,
   composerPlaceholder: "Compartí un momento…",
   postsSectionLabel: "PUBLICADO HOY",
   posts: [
