@@ -1,6 +1,6 @@
 # SPEC 01 — Home con feed de la guardería (staff)
 
-> **Estado:** Approved  
+> **Estado:** Implemented  
 > **Depende de:** —  
 > **Fecha:** 2026-11-16  
 > **Objetivo:** Implementar la plantilla `references/pantallas/feed.dc.html` como la pantalla home (`/`) responsive, descompuesta en componentes y con menú hamburguesa en mobile, usando Tailwind CSS y datos mock estáticos sin autenticación ni base de datos.
@@ -82,14 +82,14 @@ Convenciones:
 
 ## Criterios de aceptación
 
-- [ ] Al abrir `/` en `npm run dev` se renderiza el feed staff sin errores en la consola del navegador ni errores de compilación.
-- [ ] La pantalla muestra el mismo contenido textual y orden que `references/pantallas/feed.dc.html`: sala/fecha, usuario “Caro Giménez”, composer, separador “PUBLICADO HOY” y los 3 posts (LOGRO, ACTIVIDAD con placeholder de foto, ANUNCIO) con sus contadores y destinatarios.
-- [ ] `app/page.tsx` compone la vista mediante componentes; existen componentes separados al menos para sidebar/layout mobile, encabezado del feed, composer y card de post, organizados bajo `components/` en subcarpetas con propósito explícito (`layout/`, `feed/`, y `shared/` si aplica).
-- [ ] En viewport `>= md` el layout muestra sidebar sticky de `248px` y contenido principal centrado como en el mockup; en viewport `< md` el sidebar fijo se oculta y aparece un control de hamburguesa que abre un drawer lateral izquierdo con overlay y el mismo contenido del sidebar, pudiendo cerrarse al tocar el overlay o un control de cerrar.
-- [ ] El estilo visual en desktop es cercano al mockup (fondo `#F6ECDF`, tipografías Fredoka/Nunito, paleta, tarjetas, badges de tipo, sidebar activo en “Feed”) implementado con Tailwind CSS/tokens.
-- [ ] No hay autenticación, base de datos ni llamadas de red/datos reales; el contenido proviene de `app/_data/mock.ts`.
-- [ ] Salvo la apertura/cierre del menú hamburguesa, ningún enlace ni botón ejecuta navegación funcional a pantallas del producto ni acciones reales (placeholders no funcionales).
-- [ ] `npx tsc --noEmit` finaliza sin errores atribuibles a los cambios de esta spec.
+- [x] Al abrir `/` en `npm run dev` se renderiza el feed staff sin errores en la consola del navegador ni errores de compilación. Evidencia: GET / → 200; consola solo muestra mensajes informativos de React DevTools/HMR (`.playwright-mcp/console-2026-11-17T02-38-44-628Z.log`). Captura desktop: `.playwright-mcp/page-2026-11-17T02-38-58-928Z.png`.
+- [x] La pantalla muestra el mismo contenido textual y orden que `references/pantallas/feed.dc.html`: sala/fecha (“GUARDERÍA · SALA SOLES”, “12 niños · martes 17 jun”), usuario “Caro Giménez / Maestra · Soles”, composer (“Compartí un momento…”), separador “PUBLICADO HOY” y los 3 posts en orden (LOGRO Mateo 14:20, ACTIVIDAD Mateo 09:40 con placeholder “Foto · pintando con témperas”, ANUNCIO general 07:50) con contadores (3/1, 5/2, 8/0) y destinatarios. Datos en `app/_data/mock.ts`.
+- [x] `app/page.tsx` compone la vista mediante componentes: `Sidebar`, `MobileMenu` (`components/layout/`), `FeedHeader`, `Composer`, `PostCard` (`components/feed/`), iconos compartidos (`components/shared/icons.tsx`). Cada subcarpeta tiene `README.md` con su propósito explícito.
+- [x] Viewport `>= md`: sidebar sticky `h-screen w-[248px]` y principal centrado `max-w-[760px]`. Viewport `< md`: sidebar oculto (`md:hidden`), barra superior con hamburguesa que abre drawer lateral izquierdo con overlay (`bg-ink/35`) y el mismo `Sidebar`; se cierra tocando el botón X y Escape (verificado con Playwright en `.playwright-mcp/page-2026-11-17T02-39-32-799Z.yml` y `.playwright-mcp/page-2026-11-17T02-40-16-920Z.yml`). Capturas: `mobile-closed.png`, `mobile-drawer-open.png`, `mobile-closed-verify.png`.
+- [x] Estilo visual en desktop cercano al mockup: fondo `#f6ecdf` (`--color-background`), texto `#3f362e` (`--color-ink`), Fredoka/Nunito vía `next/font/google` en `app/layout.tsx` y `@theme` en `app/globals.css`, paleta de badges/avatar/tarjetas, sidebar activo en “Feed”. Captura desktop confirma fidelidad visual.
+- [x] No hay autenticación, base de datos ni llamadas de red/datos reales; el contenido proviene estáticamente de `app/_data/mock.ts`. No hay `fetch` ni rutas de API en la implementación.
+- [x] Salvo el menú hamburguesa, todos los enlaces/botones son placeholders (`href="#"`) sin navegación funcional. Única interacción real: abrir/cerrar drawer mobile.
+- [x] `npx tsc --noEmit` finaliza sin errores (ejecutado, salida vacía).
 
 ## Decisiones
 
