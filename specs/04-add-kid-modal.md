@@ -1,6 +1,6 @@
 # SPEC 04 — Modal "Agregar niño" en `/kids`
 
-> **Estado:** Aprobado  
+> **Estado:** Implemented  
 > **Depende de:** SPEC 02  
 > **Fecha:** 2026-11-17  
 > **Objetivo:** Implementar la plantilla `references/pantallas/agregar-nino.dc.html` como modal sobre `/kids` (abierto por el botón «Agregar niño») con formulario validado (nombre, fecha con máscara, sala, alergias, notas) que agrega el niño en memoria al listado agrupado por sala.
@@ -105,19 +105,19 @@ Convenciones:
 
 ## Criterios de aceptación
 
-- [ ] El botón "Agregar niño" abre el modal en la misma página (URL sin cambios); el resto de `/kids` queda visible detrás del overlay.
-- [ ] El modal reproduce `agregar-nino.dc.html`: card centrada `max-w-[520px]` con fondo `#FBF4EC`, borde `#ECE0D0`, radio 24px y sombra del mockup; header "Cancelar / Agregar niño / Guardar"; 5 campos con labels, estilos y placeholders exactos; FECHA + SALA en fila en `>= sm` y apilados en `< sm`.
-- [ ] SALA es un select nativo con la caja del mockup + chevron: inicial "Seleccioná una sala" y opciones Soles, Mar y Jardín.
-- [ ] La máscara de fecha funciona: tipear "12032022" produce "12/03/2022"; ignora no dígitos; máximo 10 caracteres.
-- [ ] "Guardar" con el form vacío no cierra el modal: nombre, fecha y sala con borde `#D9684A` + su mensaje bajo el campo y foco en el primero inválido.
-- [ ] "31/02/2026" y una fecha incompleta se rechazan como inválidas; una fecha futura se rechaza con su mensaje; corregir un campo limpia su error.
-- [ ] "Guardar" válido cierra el modal y agrega al niño como primera card de su sección: avatar con inicial y color del ciclo, "N años" calculado, "sin padres vinculados", chips de alergia en uppercase y VINCULAR.
-- [ ] Agregar a Mar/Jardín crea su sección ("SALA MAR · 1 niño") debajo de Soles; agregar a Soles pone la card primera en la sección existente; contadores derivados con plural correcto.
-- [ ] Sin altas, `/kids` se renderiza idéntico al mockup actual: única sección "SALA SOLES · 8 niños".
-- [ ] La card del niño agregado enlaza a su `/kids/[id]` y muestra la página 404; navegar o recargar vuelve al listado estático de 8.
-- [ ] "Cancelar", click en overlay y Escape cierran con animación de salida; el body no scrollea con el modal abierto; apertura y cierre animan overlay y card (~200ms, fade + scale sutil).
-- [ ] El modal expone `role="dialog"`, `aria-modal`, `aria-labelledby` y cierra con Escape.
-- [ ] `npx tsc --noEmit` sin errores; 0 errores de consola en los flujos; capturas en `.playwright-mcp/`.
+- [x] El botón "Agregar niño" abre el modal en la misma página (URL sin cambios); el resto de `/kids` queda visible detrás del overlay. Verificado con Playwright: URL permanece `/kids`, overlay `bg-ink/35` sobre el listado (capturas `spec04-modal-open.png`, `spec04-modal-1280.png`).
+- [x] El modal reproduce `agregar-nino.dc.html`: card centrada `max-w-[520px]` con fondo `#FBF4EC`, borde `#ECE0D0`, radio 24px y sombra del mockup; header "Cancelar / Agregar niño / Guardar"; 5 campos con labels, estilos y placeholders exactos; FECHA + SALA en fila en `>= sm` y apilados en `< sm`. Verificado por estilos computados: card 520px/`rgb(251,244,236)`/`rgb(236,224,208)`/24px/sombra exacta; header `20px 26px` + borde inferior; cuerpo `24px 26px`; labels 12px/800/tracking .7px/muted; inputs `13px 16px`/15px/radio 14px/borde `#EADFD0`/placeholders `#B6A99B`; fila flex gap 14px con `flex:1` en ≥sm y columna en `<sm` (overlay 16px en móvil). Referencia capturada en `spec04-mockup-reference.png`.
+- [x] SALA es un select nativo con la caja del mockup + chevron: inicial "Seleccioná una sala" y opciones Soles, Mar y Jardín. Verificado: `HTMLSelectElement` con `appearance:none`, valor en bold (700) color ink, chevron 16px `rgb(176,162,144)` posicionado; placeholder `<option value="" disabled>` seleccionado.
+- [x] La máscara de fecha funciona: tipear "12032022" produce "12/03/2022"; ignora no dígitos; máximo 10 caracteres. Verificado: tipeo secuencial → "12/03/2022"; pegado "1a2/b-34c5678xyz" → "12/34/5678" (10 caracteres, letras y excedente descartados).
+- [x] "Guardar" con el form vacío no cierra el modal: nombre, fecha y sala con borde `#D9684A` + su mensaje bajo el campo y foco en el primero inválido. Verificado: modal permanece abierto, bordes `rgb(217,104,74)` en los 3 campos, mensajes "Ingresá el nombre completo." / "Ingresá una fecha válida en formato dd/mm/aaaa." / "Seleccioná una sala." (color `rgb(197,65,58)`), foco en el nombre.
+- [x] "31/02/2026" y una fecha incompleta se rechazan como inválidas; una fecha futura se rechaza con su mensaje; corregir un campo limpia su error. Verificado: "31022026" y "120320" → mensaje de formato; "01012030" → "La fecha no puede ser futura."; re-tipear "12032022" limpia el error (revalidación on change).
+- [x] "Guardar" válido cierra el modal y agrega al niño como primera card de su sección: avatar con inicial y color del ciclo, "N años" calculado, "sin padres vinculados", chips de alergia en uppercase y VINCULAR. Verificado: "Martina López" 12/03/2022 Soles → primera card de SALA SOLES con avatar M azul (inicio del ciclo), "4 años", "sin padres vinculados", chips MANÍ + LACTOSA (uppercase) y VINCULAR; nacida 20/06/2025 → "1 año"; 20/06/2026 → "4 meses".
+- [x] Agregar a Mar/Jardín crea su sección ("SALA MAR · 1 niño") debajo de Soles; agregar a Soles pone la card primera en la sección existente; contadores derivados con plural correcto. Verificado: tras altas → SALA SOLES "9 niños", SALA MAR "1 niño", SALA JARDÍN "1 niño" (orden Soles → Mar → Jardín); segunda "Martina López" → `/kids/martina-lopez-2` primera de su sección con "10 niños".
+- [x] Sin altas, `/kids` se renderiza idéntico al mockup actual: única sección "SALA SOLES · 8 niños". Verificado en carga limpia y tras reload (capturas `spec04-kids-initial.png`, `spec04-final-static-kids.png`); chips de los 8 iniciales intactos (Mateo MANÍ, Tomás LACTOSA, Valentina VINCULAR).
+- [x] La card del niño agregado enlaza a su `/kids/[id]` y muestra la página 404; navegar o recargar vuelve al listado estático de 8. Verificado: `/kids/julia-rios` → "404 This page could not be found."; volver a `/kids` → única sección "SALA SOLES · 8 niños".
+- [x] "Cancelar", click en overlay y Escape cierran con animación de salida; el body no scrollea con el modal abierto; apertura y cierre animan overlay y card (~200ms, fade + scale sutil). Verificado: los 3 cierres dejan overlay `opacity-0` + `inert` (modal siempre montado); `body.style.overflow` "hidden" abierto y restaurado al cerrar; transiciones 0.2s `opacity` (overlay) y 0.2s `opacity, scale` (card, `scale-[0.98]` cerrado).
+- [x] El modal expone `role="dialog"`, `aria-modal`, `aria-labelledby` y cierra con Escape. Verificado por atributos en el DOM (`aria-labelledby="add-kid-modal-title"` apunta al título) y cierre por Escape.
+- [x] `npx tsc --noEmit` sin errores; 0 errores de consola en los flujos; capturas en `.playwright-mcp/`. Verificado: `npx tsc --noEmit` OK; 8 mensajes de consola en la sesión, 0 errores/0 warnings; capturas `spec04-*.png` en `.playwright-mcp/`.
 
 ## Decisiones
 
