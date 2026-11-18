@@ -28,12 +28,40 @@ const badgeStyles: Record<
     dot: "bg-announcement-avatar-fg",
     text: "text-announcement-avatar-fg",
   },
+  meal: {
+    label: "COMIDA",
+    wrapper: "bg-meal-badge-bg",
+    dot: "bg-meal-badge-fg",
+    text: "text-meal-badge-fg",
+  },
+  nap: {
+    label: "SIESTA",
+    wrapper: "bg-nap-badge-bg",
+    dot: "bg-nap-badge-fg",
+    text: "text-nap-badge-fg",
+  },
+  photo: {
+    label: "FOTO",
+    wrapper: "bg-photo-badge-bg",
+    dot: "bg-photo-badge-fg",
+    text: "text-photo-badge-fg",
+  },
+  encouragement: {
+    label: "ÁNIMO",
+    wrapper: "bg-encouragement-badge-bg",
+    dot: "bg-encouragement-badge-fg",
+    text: "text-encouragement-badge-fg",
+  },
 };
 
 const avatarStyles: Record<PostType, string> = {
   achievement: "bg-child-avatar-bg text-child-avatar-fg",
   activity: "bg-child-avatar-bg text-child-avatar-fg",
   announcement: "bg-announcement-avatar-bg text-announcement-avatar-fg",
+  meal: "bg-meal-badge-bg text-meal-badge-fg",
+  nap: "bg-nap-badge-bg text-nap-badge-fg",
+  photo: "bg-photo-badge-bg text-photo-badge-fg",
+  encouragement: "bg-encouragement-badge-bg text-encouragement-badge-fg",
 };
 
 type PostCardProps = {
