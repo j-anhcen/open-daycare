@@ -36,6 +36,30 @@
   --color-activity-badge-bg: #c7e7f1;
   --color-activity-badge-fg: #2e89a6;
 
+  --color-meal-badge-bg: #f4dc8e;
+  --color-meal-badge-fg: #9a7b1e;
+  --color-nap-badge-bg: #e7dcf6;
+  --color-nap-badge-fg: #7b5fc0;
+  --color-photo-badge-bg: #fbd8cc;
+  --color-photo-badge-fg: #d9684a;
+  --color-encouragement-badge-bg: #f9d2de;
+  --color-encouragement-badge-fg: #c56486;
+
+  --color-post-type-meal-bg: #9a7b1e;
+  --color-post-type-meal-fg: #ffffff;
+  --color-post-type-nap-bg: #e7dcf6;
+  --color-post-type-nap-fg: #7b5fc0;
+  --color-post-type-activity-bg: #2e89a6;
+  --color-post-type-activity-fg: #ffffff;
+  --color-post-type-achievement-bg: #cfebd8;
+  --color-post-type-achievement-fg: #3e9b6c;
+  --color-post-type-encouragement-bg: #f9d2de;
+  --color-post-type-encouragement-fg: #c56486;
+  --color-post-type-photo-bg: #fbd8cc;
+  --color-post-type-photo-fg: #d9684a;
+  --color-post-type-announcement-bg: #ccd8f4;
+  --color-post-type-announcement-fg: #4e72c8;
+
   --color-avatar-blue-bg: #a9d9e8;
   --color-avatar-blue-fg: #1f7a93;
   --color-avatar-pink-bg: #f4b8cc;

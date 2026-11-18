@@ -1,7 +1,7 @@
 import { feedPageData } from "@/app/_data/mock";
 import { Composer } from "@/components/feed/Composer";
 import { FeedHeader } from "@/components/feed/FeedHeader";
-import { PostCard } from "@/components/feed/PostCard";
+import { FeedPosts } from "@/components/feed/FeedPosts";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 import { Sidebar } from "@/components/layout/Sidebar";
 
@@ -47,11 +47,7 @@ export default function Home() {
               <span className="h-px flex-1 bg-[#E7DAC8]" />
             </div>
 
-            <div className="flex flex-col gap-4">
-              {posts.map((post) => (
-                <PostCard key={post.id} post={post} />
-              ))}
-            </div>
+            <FeedPosts posts={posts} />
           </div>
         </main>
       </div>

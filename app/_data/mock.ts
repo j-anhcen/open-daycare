@@ -1,4 +1,46 @@
-export type PostType = "achievement" | "activity" | "announcement";
+export type PostType =
+  | "achievement"
+  | "activity"
+  | "announcement"
+  | "meal"
+  | "nap"
+  | "photo"
+  | "encouragement";
+
+export type PostAudience = {
+  id: string;
+  label: string;
+  initial?: string;
+};
+
+export type PostTypeOption = { value: PostType; label: string };
+
+export type FormPhoto = { id: string; name: string };
+
+export type CreatePostFormValues = {
+  recipients: string[];
+  postType: PostType;
+  description: string;
+  photos: FormPhoto[];
+};
+
+export type CreatePostModalData = {
+  title: string;
+  cancelLabel: string;
+  publishLabel: string;
+  recipientsLabel: string;
+  recipients: PostAudience[];
+  typeLabel: string;
+  postTypes: PostTypeOption[];
+  descriptionLabel: string;
+  descriptionPlaceholder: string;
+  initialDescription: string;
+  photosLabel: string;
+  addPhotoLabel: string;
+  newPostPhotoLabel: string;
+  allAudienceName: string;
+  errorMessage: { descriptionRequired: string };
+};
 
 export type StaffUser = {
   name: string;
@@ -79,3 +121,85 @@ export const feedPageData: FeedPageData = {
     },
   ],
 };
+
+export const createPostModalData: CreatePostModalData = {
+  title: "Nueva publicación",
+  cancelLabel: "Cancelar",
+  publishLabel: "Publicar",
+  recipientsLabel: "PARA",
+  recipients: [
+    { id: "mateo", label: "Mateo", initial: "M" },
+    { id: "sofia", label: "Sofía", initial: "S" },
+    { id: "benjamin", label: "Benjamín", initial: "B" },
+    { id: "all", label: "Toda la sala" },
+  ],
+  typeLabel: "TIPO",
+  postTypes: [
+    { value: "meal", label: "Comida" },
+    { value: "nap", label: "Siesta" },
+    { value: "activity", label: "Actividad" },
+    { value: "achievement", label: "Logro" },
+    { value: "encouragement", label: "Ánimo" },
+    { value: "photo", label: "Foto" },
+    { value: "announcement", label: "Anuncio" },
+  ],
+  descriptionLabel: "DESCRIPCIÓN",
+  descriptionPlaceholder: "Contá cómo le fue hoy…",
+  initialDescription:
+    "Pintamos con témperas esta mañana. Mateo eligió el azul para todo y se concentró un montón.",
+  photosLabel: "FOTOS",
+  addPhotoLabel: "Agregar",
+  newPostPhotoLabel: "Foto · nueva publicación",
+  allAudienceName: "Anuncio general",
+  errorMessage: {
+    descriptionRequired: "Escribí una descripción para publicar.",
+  },
+};
+
+export const createPostInitialFormValues: CreatePostFormValues = {
+  recipients: ["mateo"],
+  postType: "activity",
+  description: createPostModalData.initialDescription,
+  photos: [{ id: "initial-photo", name: "" }],
+};
+
+/**
+ * Derives the `FeedPost` for a valid "Nueva publicación" submission. The
+ * audience is read in mockup order so labels stay stable regardless of the
+ * order in which recipients were selected. Assumes the form was validated.
+ */
+export function buildFeedPostFromForm(values: CreatePostFormValues): FeedPost {
+  const selectedRecipients = createPostModalData.recipients.filter((recipient) =>
+    values.recipients.includes(recipient.id),
+  );
+  const isWholeRoom = values.recipients.includes("all");
+  const firstChild = selectedRecipients.find(
+    (recipient) => recipient.initial !== undefined,
+  );
+  const announcementInitial =
+    createPostModalData.allAudienceName.charAt(0);
+
+  return {
+    id: crypto.randomUUID(),
+    type: values.postType,
+    authorName: isWholeRoom
+      ? createPostModalData.allAudienceName
+      : (firstChild?.label ?? createPostModalData.allAudienceName),
+    authorInitial: isWholeRoom
+      ? announcementInitial
+      : (firstChild?.initial ?? announcementInitial),
+    timeLabel: "ahora · publicado por vos",
+    audienceLabel: isWholeRoom
+      ? "Para: toda la sala"
+      : `Para: familia de ${selectedRecipients
+          .map((recipient) => recipient.label)
+          .join(", ")}`,
+    body: values.description.trim(),
+    likesCount: 0,
+    commentsCount: 0,
+    photoPlaceholderLabel:
+      values.photos.length > 0
+        ? createPostModalData.newPostPhotoLabel
+        : undefined,
+  };
+}
