@@ -23,25 +23,29 @@ function parentsCountLabel(count: number): string {
 }
 
 function KidCardTrailing({ kid }: KidCardProps) {
-  if (kid.parents.length === 0) {
+  if (kid.parents.length > 0 && kid.allergyLabels.length === 0) {
     return (
-      <span className={`${chipBaseClass} bg-link-chip-bg text-link-chip-fg`}>
-        VINCULAR
-      </span>
+      <ChevronRightIcon className="h-[18px] w-[18px] flex-none text-[#CBB89F]" />
     );
   }
 
-  if (kid.allergyLabel) {
-    return (
-      <span
-        className={`${chipBaseClass} bg-allergy-chip-bg text-allergy-chip-fg`}
-      >
-        {kid.allergyLabel}
-      </span>
-    );
-  }
-
-  return <ChevronRightIcon className="h-[18px] w-[18px] flex-none text-[#CBB89F]" />;
+  return (
+    <span className="flex flex-none items-center gap-2">
+      {kid.allergyLabels.map((label, index) => (
+        <span
+          key={`${label}-${index}`}
+          className={`${chipBaseClass} bg-allergy-chip-bg text-allergy-chip-fg`}
+        >
+          {label}
+        </span>
+      ))}
+      {kid.parents.length === 0 && (
+        <span className={`${chipBaseClass} bg-link-chip-bg text-link-chip-fg`}>
+          VINCULAR
+        </span>
+      )}
+    </span>
+  );
 }
 
 export function KidCard({ kid }: KidCardProps) {

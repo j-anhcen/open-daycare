@@ -68,6 +68,12 @@
   --color-auth-background: #fbf4ec;
   --color-auth-input-border: #eadfd0;
 
+  --color-modal-surface: #fbf4ec;
+  --color-input-border: #eadfd0;
+  --color-input-placeholder: #b6a99b;
+  --color-input-error-border: #d9684a;
+  --color-input-error-text: #c5413a;
+
   --color-consent-box-bg: #fbf1d6;
   --color-consent-box-text: #8a7234;
   --color-consent-check: #5fb97e;
