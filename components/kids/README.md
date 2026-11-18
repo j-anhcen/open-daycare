@@ -11,8 +11,12 @@ Kids screen presentation components (`/kids` and `/kids/[id]`), fed by
 - `ProfileHeader.tsx` — profile identity block (84px avatar, name, “edad · Sala X”, placeholder “Editar” button). The “Volver a Niños” link is rendered by the page above the two-column layout so the identity block stays inside the left column exactly as the mockup lays it out.
 - `AllergyNoteCard.tsx` — “Alergias y notas” warning box; the page renders it only when the kid has an allergy note.
 - `ProfileDetailsCard.tsx` — “Fecha de nacimiento / Sala / Ingreso” detail rows.
-- `LinkedParentsCard.tsx` — “PADRES VINCULADOS”: solid parent avatars, “rol · estado” line, ACTIVA/PENDIENTE status badges and the “Vincular otro padre” placeholder link (rendered even for kids without linked parents).
+- `LinkedParentsCard.tsx` — “PADRES VINCULADOS”: solid parent avatars, “rol · estado” line, ACTIVA/PENDIENTE status badges and the “Vincular otro padre” button (`onLinkParent`, rendered even for kids without linked parents).
+- `KidProfileAside.tsx` — client wrapper for the profile's right column: owns the “Vincular padre” modal open state and the in-memory `linkedParents` list, composes the “Resumen del día” placeholder, `LinkedParentsCard` and `LinkParentModal`. The page stays a server component and only passes `kid`.
+- `LinkParentModal.tsx` — always-mounted “Vincular padre” dialog over `/kids/[id]` (no route change; fade + subtle scale ~200ms, `inert` when closed, Escape/overlay/X close, body scroll lock, `role="dialog"` + `aria-modal` + `aria-labelledby`): header subtitle derived from `kid.name`, info box using the first name, NOMBRE/EMAIL fields, unique PARENTESCO radio group with “Mamá” preselected, fixed `7K4P9` invitation code box and “Enviar invitación” CTA. Inline validation against `linkParentModalData.errorMessages` (required name/email, invalid email rejected; errors clear on edit; focus moves to the first invalid field). A valid submit derives a pending parent, closes and resets the form.
 
 Kids added through the modal are derived by `buildKidFromForm` (`app/_data/kids.ts`)
 and live in memory only: their `/kids/[id]` profile links resolve to the 404 page,
-and navigating or reloading brings back the eight mock kids.
+and navigating or reloading brings back the eight mock kids. Parents added through
+the “Vincular padre” modal are derived by `buildLinkedParentFromForm` and also live
+in memory only: reloading or navigating restores the kid's mock parents.

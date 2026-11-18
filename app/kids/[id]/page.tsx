@@ -4,12 +4,12 @@ import { notFound } from "next/navigation";
 import { getKidById, kidsPageData } from "@/app/_data/kids";
 import { currentUser } from "@/app/_data/mock";
 import { AllergyNoteCard } from "@/components/kids/AllergyNoteCard";
-import { LinkedParentsCard } from "@/components/kids/LinkedParentsCard";
+import { KidProfileAside } from "@/components/kids/KidProfileAside";
 import { ProfileDetailsCard } from "@/components/kids/ProfileDetailsCard";
 import { ProfileHeader } from "@/components/kids/ProfileHeader";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 import { Sidebar } from "@/components/layout/Sidebar";
-import { ArrowLeftIcon, SunIcon } from "@/components/shared/icons";
+import { ArrowLeftIcon } from "@/components/shared/icons";
 
 // Opt out of instant-navigation validation for this route: the page reads
 // `params` at the render root (data is fully static and prerendered via
@@ -72,16 +72,7 @@ export default async function KidProfilePage(props: PageProps<"/kids/[id]">) {
                 <ProfileDetailsCard kid={kid} />
               </div>
 
-              <div className="flex w-[300px] flex-none flex-col gap-[14px]">
-                <a
-                  href="#"
-                  className="flex w-full items-center justify-center gap-[9px] rounded-[14px] bg-ink p-[13px] text-[15px] font-extrabold text-white"
-                >
-                  <SunIcon className="h-[18px] w-[18px]" strokeWidth={2} />
-                  Resumen del día
-                </a>
-                <LinkedParentsCard kid={kid} />
-              </div>
+              <KidProfileAside kid={kid} />
             </div>
           </div>
         </main>
