@@ -4,6 +4,7 @@ import { PlusIcon } from "@/components/shared/icons";
 
 type LinkedParentsCardProps = {
   kid: Kid;
+  onLinkParent: () => void;
 };
 
 const statusBadges: Record<
@@ -48,7 +49,10 @@ function ParentRow({ parent }: { parent: LinkedParent }) {
   );
 }
 
-export function LinkedParentsCard({ kid }: LinkedParentsCardProps) {
+export function LinkedParentsCard({
+  kid,
+  onLinkParent,
+}: LinkedParentsCardProps) {
   return (
     <div className="rounded-[16px] border border-line bg-surface px-[18px] py-4">
       <div className="mb-[14px] text-[12.5px] font-extrabold tracking-[0.8px] text-muted-strong">
@@ -58,14 +62,14 @@ export function LinkedParentsCard({ kid }: LinkedParentsCardProps) {
         {kid.parents.map((parent) => (
           <ParentRow key={parent.name} parent={parent} />
         ))}
-        <a href="#" className="flex items-center gap-3 pt-2">
+        <button type="button" onClick={onLinkParent} className="flex items-center gap-3 pt-2">
           <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full border-[1.5px] border-dashed border-[#D8CBBA] text-muted-faint">
             <PlusIcon className="h-[18px] w-[18px]" strokeWidth={2.2} />
           </span>
           <span className="text-[14.5px] font-extrabold text-accent-strong">
             Vincular otro padre
           </span>
-        </a>
+        </button>
       </div>
     </div>
   );

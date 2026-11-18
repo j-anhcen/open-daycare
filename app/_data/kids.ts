@@ -29,6 +29,35 @@ export type Kid = {
   parents: LinkedParent[];
 };
 
+export type ParentRelationship = "mom" | "dad" | "tutor";
+
+export type LinkParentFormValues = {
+  name: string;
+  email: string;
+  relationship: ParentRelationship;
+};
+
+export type LinkParentModalData = {
+  title: string;
+  subtitlePrefix: string;
+  infoText: string;
+  nameLabel: string;
+  namePlaceholder: string;
+  emailLabel: string;
+  emailPlaceholder: string;
+  relationshipLabel: string;
+  relationshipOptions: { value: ParentRelationship; label: string }[];
+  codeLabel: string;
+  invitationCode: string;
+  expiryLabel: string;
+  submitLabel: string;
+  errorMessages: {
+    nameRequired: string;
+    emailRequired: string;
+    emailInvalid: string;
+  };
+};
+
 export type AddKidFormValues = {
   name: string;
   birthDate: string; // "dd/mm/aaaa"
@@ -252,6 +281,32 @@ export const kidsPageData: KidsPageData = {
   ],
 };
 
+export const linkParentModalData: LinkParentModalData = {
+  title: "Vincular padre",
+  subtitlePrefix: "a ",
+  infoText:
+    "Le enviaremos un correo con un código para que active su cuenta. Solo verá el feed de {firstName}.",
+  nameLabel: "NOMBRE DEL PADRE/MADRE",
+  namePlaceholder: "Ej. Diego Fernández",
+  emailLabel: "EMAIL",
+  emailPlaceholder: "correo@ejemplo.com",
+  relationshipLabel: "PARENTESCO",
+  relationshipOptions: [
+    { value: "mom", label: "Mamá" },
+    { value: "dad", label: "Papá" },
+    { value: "tutor", label: "Tutor/a" },
+  ],
+  codeLabel: "CÓDIGO DE INVITACIÓN",
+  invitationCode: "7K4P9",
+  expiryLabel: "Vence en 7 días",
+  submitLabel: "Enviar invitación",
+  errorMessages: {
+    nameRequired: "Ingresá el nombre del padre o madre.",
+    emailRequired: "Ingresá el correo electrónico.",
+    emailInvalid: "Ingresá un correo válido.",
+  },
+};
+
 export const addKidModalData: AddKidModalData = {
   title: "Agregar niño",
   cancelLabel: "Cancelar",
@@ -427,6 +482,36 @@ export function buildKidFromForm(
     roomLabel: values.room,
     enrollmentLabel: buildEnrollmentLabel(today),
     parents: [],
+  };
+}
+
+/**
+ * Derives the pending `LinkedParent` row for a valid "Vincular padre" submission.
+ * `kid` is part of the signature for callers, but the row itself is derived
+ * solely from the form values (the email is validated and never persisted).
+ */
+export function buildLinkedParentFromForm(
+  values: LinkParentFormValues,
+  kid: Kid,
+): LinkedParent {
+  void kid;
+
+  const name = values.name.trim();
+  const relationship = linkParentModalData.relationshipOptions.find(
+    (option) => option.value === values.relationship,
+  );
+
+  if (!relationship) {
+    throw new Error(`Invalid parent relationship: ${values.relationship}`);
+  }
+
+  return {
+    name,
+    initial: name.charAt(0).toUpperCase(),
+    roleLabel: relationship.label,
+    statusLabel: "invitación enviada",
+    status: "pending",
+    avatarColor: values.relationship === "mom" ? "purple" : "blue",
   };
 }
 

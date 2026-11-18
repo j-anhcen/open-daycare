@@ -74,6 +74,18 @@
   --color-input-error-border: #d9684a;
   --color-input-error-text: #c5413a;
 
+  --color-close-button-bg: #f0e6d8;
+
+  --color-info-box-bg: #e3ecfb;
+  --color-info-text: #3f5694;
+  --color-info-icon: #4e72c8;
+
+  --color-relationship-selected-border: #9fb8ec;
+  --color-relationship-selected-bg: #ccd8f4;
+
+  --color-code-box-border: #e6d08a;
+  --color-code-label: #a88526;
+
   --color-consent-box-bg: #fbf1d6;
   --color-consent-box-text: #8a7234;
   --color-consent-check: #5fb97e;
