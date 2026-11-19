@@ -31,7 +31,7 @@ Before the final response, run one reporting pass. If candidates remain, from th
 
 # open-daycare
 
-Daycare staff/family app scaffolded with `create-next-app`. `app/` is still the default starter — the actual UI to build is defined by the mockups in `references/pantallas/` (Spanish copy) and `references/screenshots/`. Ignore the generic `README.md`; treat the mockups as the design source.
+Daycare staff/family app scaffolded with `create-next-app`. `app/` is still the default starter — the actual UI to build is defined by the mockups in `references/pantallas/` (Spanish copy) and `references/screenshots/`. Ignore the generic `README.md`; treat the mockups as the design source. Persistence is planned in Supabase (Postgres); the target schema is the `docs` reference (`../07-DB-Schema`), not yet implemented in any database.
 
 ## Commands
 
@@ -47,6 +47,20 @@ Daycare staff/family app scaffolded with `create-next-app`. `app/` is still the 
 - `next.config.ts` enables `cacheComponents` and `partialPrefetching`. Read `node_modules/next/dist/docs/01-app/01-getting-started/08-caching.md` and `01-app/02-guides/adopting-partial-prefetching.md` before adding data fetching or caching.
 - Tailwind v4 is wired as a Turbopack CSS loader through `@tailwindcss/turbopack`; there is no PostCSS or `tailwind.config` file. Add theme tokens in `app/globals.css` using `@theme`.
 - Import alias `@/*` maps to the repo root (`./*`), not `src/`.
+
+## Supabase
+
+Persistence layer is Supabase. No client packages are installed yet (`@supabase/ssr`, `supabase-js`); when wiring them, pin versions and commit the lockfile.
+
+- **Skills (in `.agents/skills/`) — load them before acting:**
+  - `supabase` — ANY Supabase task: Database/Auth/Edge Functions/Realtime/Storage/Vectors/Cron/Queues, client + SSR integrations, auth/sessions/JWT/cookies/RLS, CLI or MCP, schema changes/migrations, security audits, and debugging errors or logs.
+  - `supabase-postgres-best-practices` — BEFORE writing or changing anything in Postgres: tables/columns/types, schema design, migrations, RLS policies and their tests, indexes, triggers, functions, queues/scheduled jobs, pgvector, or diagnosing slow queries, locks, timeouts and bloat. Even a one-column change counts.
+- **Schema reference:** `../07-DB-Schema/opendaycare-database-schema.md` (tables, columns, relations to create). Reference only — do not assume it exists in the remote DB.
+- **Docs over memory:** Supabase changes often. Scan `https://supabase.com/changelog.md` for relevant breaking changes and fetch current docs before implementing (MCP `search_docs` first, or append `.md` to any docs URL). For any Supabase error, read `https://supabase.com/docs/guides/monitoring-and-debugging.md` before diagnosing.
+- **Security:** enable RLS on every table in exposed schemas (`public` included); never use `user_metadata` for authorization (use `app_metadata`); never expose `service_role`/secret keys — every `NEXT_PUBLIC_` var ships to the browser; prefer `TO authenticated` + an ownership predicate over deprecated `auth.role()`; UPDATE policies need both `USING` and `WITH CHECK`; views need `security_invoker = true` (PG15+) or revoked `anon`/`authenticated` access; avoid `SECURITY DEFINER`; Storage upsert needs INSERT + SELECT + UPDATE.
+- **Migrations:** decide declarative (`supabase/schemas/` or `schema_paths`) vs imperative first. Iterate with MCP `execute_sql` or `supabase db query` (CLI v2.79+); do NOT use `apply_migration` for local iteration. To commit: run advisors (`supabase db advisors` v2.81.3+ or MCP `get_advisors`), then `supabase db pull <descriptive-name> --local --yes` and verify with `supabase migration list --local`.
+- **CLI:** discover commands via `supabase --help` / `supabase <group> --help`; never guess flags. Check `supabase --version` first.
+- **Verify and recover:** confirm every fix with a test query; after 2-3 failed attempts, stop and re-check docs/logs instead of retrying.
 
 ## Reference mockups
 
@@ -65,6 +79,7 @@ Daycare staff/family app scaffolded with `create-next-app`. `app/` is still the 
 
 - Playwright is configured in `opencode.json`; keep all screenshots/artifacts in `.playwright-mcp/`.
 - Context7 is available for current framework/library documentation — prefer it over memory for library APIs.
+- Supabase MCP is available in the harness (OAuth 2.1; tools such as `search_docs`, `execute_sql`, `get_advisors`). It is not declared in `opencode.json` — if the tools are missing, check reachability (`curl -so /dev/null -w "%{http_code}" https://mcp.supabase.com/mcp`, expect `401`), trigger the OAuth flow, or use a scoped personal access token for CI/headless environments.
 
 ## Reglas de código
 
