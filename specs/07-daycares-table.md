@@ -1,6 +1,6 @@
 # SPEC 07 — Tabla `daycares` y primeras migraciones
 
-> **Estado:** Approved  
+> **Estado:** Implemented  
 > **Depende de:** —  
 > **Fecha:** 2026-11-19  
 > **Objetivo:** Crear la tabla `public.daycares` con RLS y seguridad por roles, versionarla como dos migraciones y aplicarlas al proyecto Supabase junto con 4 filas semilla.
