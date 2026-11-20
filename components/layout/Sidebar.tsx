@@ -1,4 +1,6 @@
 import Link from "next/link";
+
+import { logoutAction } from "@/app/actions/auth";
 import type { StaffUser } from "@/app/_data/mock";
 import { ComposeButton } from "@/components/feed/ComposeButton";
 import {
@@ -93,15 +95,16 @@ export function Sidebar({
               {currentUser.roleLabel}
             </div>
           </div>
-          <Link
-            href="/login"
-            onNavigate={onNavigate}
-            aria-label="Cerrar sesión"
-            title="Cerrar sesión"
-            className="flex h-8 w-8 flex-none items-center justify-center rounded-[10px] bg-background text-muted"
-          >
-            <LogoutIcon className="h-4 w-4" />
-          </Link>
+          <form action={logoutAction}>
+            <button
+              type="submit"
+              aria-label="Cerrar sesión"
+              title="Cerrar sesión"
+              className="flex h-8 w-8 flex-none items-center justify-center rounded-[10px] bg-background text-muted"
+            >
+              <LogoutIcon className="h-4 w-4" />
+            </button>
+          </form>
         </div>
       </div>
     </aside>

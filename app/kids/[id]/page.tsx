@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { getKidById, kidsPageData } from "@/app/_data/kids";
-import { currentUser } from "@/app/_data/mock";
 import { AllergyNoteCard } from "@/components/kids/AllergyNoteCard";
 import { KidProfileAside } from "@/components/kids/KidProfileAside";
 import { ProfileDetailsCard } from "@/components/kids/ProfileDetailsCard";
 import { ProfileHeader } from "@/components/kids/ProfileHeader";
-import { MobileMenu } from "@/components/layout/MobileMenu";
-import { Sidebar } from "@/components/layout/Sidebar";
+import {
+  CurrentUserMobileMenu,
+  CurrentUserSidebar,
+} from "@/components/layout/CurrentUserNavigation";
 import { ArrowLeftIcon } from "@/components/shared/icons";
 
 // Opt out of instant-navigation validation for this route: the page reads
@@ -44,14 +46,17 @@ export default async function KidProfilePage(props: PageProps<"/kids/[id]">) {
 
   return (
     <div className="min-h-screen bg-background">
-      <MobileMenu currentUser={currentUser} activeItem="kids" />
+      <Suspense fallback={null}>
+        <CurrentUserMobileMenu activeItem="kids" />
+      </Suspense>
 
       <div className="md:flex">
-        <Sidebar
-          currentUser={currentUser}
-          activeItem="kids"
-          className="sticky top-0 hidden h-screen w-[248px] shrink-0 md:flex"
-        />
+        <Suspense fallback={null}>
+          <CurrentUserSidebar
+            activeItem="kids"
+            className="sticky top-0 hidden h-screen w-[248px] shrink-0 md:flex"
+          />
+        </Suspense>
 
         <main className="min-w-0 flex-1 md:h-screen md:overflow-y-auto">
           <div className="mx-auto w-full max-w-[820px] px-4 pt-6 pb-16 sm:px-6 md:px-10 md:pt-[34px] md:pb-20">
