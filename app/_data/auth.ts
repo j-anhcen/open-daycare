@@ -11,7 +11,7 @@ export type LoginPageData = {
   submitLabel: string;
   signupQuestion: string;
   signupLinkLabel: string;
-  prefillEmail: string;
+  emailPlaceholder: string;
   passwordPlaceholder: string;
 };
 
@@ -49,7 +49,7 @@ export const loginPageData: LoginPageData = {
   submitLabel: "Iniciar sesión",
   signupQuestion: "¿Te invitó la guardería?",
   signupLinkLabel: "Activá tu cuenta",
-  prefillEmail: "caro@opendaycare.com",
+  emailPlaceholder: "caro@opendaycare.com",
   passwordPlaceholder: "••••••••",
 };
 

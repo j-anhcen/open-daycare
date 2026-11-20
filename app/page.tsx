@@ -1,9 +1,13 @@
+import { Suspense } from "react";
+
 import { feedPageData } from "@/app/_data/mock";
 import { Composer } from "@/components/feed/Composer";
 import { FeedHeader } from "@/components/feed/FeedHeader";
 import { FeedPosts } from "@/components/feed/FeedPosts";
-import { MobileMenu } from "@/components/layout/MobileMenu";
-import { Sidebar } from "@/components/layout/Sidebar";
+import {
+  CurrentUserMobileMenu,
+  CurrentUserSidebar,
+} from "@/components/layout/CurrentUserNavigation";
 
 export default function Home() {
   const {
@@ -18,14 +22,17 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      <MobileMenu currentUser={currentUser} activeItem="feed" />
+      <Suspense fallback={null}>
+        <CurrentUserMobileMenu activeItem="feed" />
+      </Suspense>
 
       <div className="md:flex">
-        <Sidebar
-          currentUser={currentUser}
-          activeItem="feed"
-          className="sticky top-0 hidden h-screen w-[248px] shrink-0 md:flex"
-        />
+        <Suspense fallback={null}>
+          <CurrentUserSidebar
+            activeItem="feed"
+            className="sticky top-0 hidden h-screen w-[248px] shrink-0 md:flex"
+          />
+        </Suspense>
 
         <main className="min-w-0 flex-1 md:h-screen md:overflow-y-auto">
           <div className="mx-auto w-full max-w-[760px] px-4 pt-6 pb-16 sm:px-6 md:px-10 md:pt-[34px] md:pb-20">
