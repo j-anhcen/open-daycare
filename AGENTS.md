@@ -73,6 +73,7 @@ Persistence layer is Supabase. No client packages are installed yet (`@supabase/
 
 - Feature work uses the `spec` and `spec-impl` skills in `.agents/skills/`; specs are written to `specs/NN-slug.md`.
 - `specs/` does not exist yet. The `spec` skill creates it and `specs/.spec-config.yml` on first use.
+- **Database specs:** any spec that references the database (schema, tables, columns, migrations, RLS, indexes, triggers, functions, Supabase config, or data access/persistence) must be saved under `specs/database/` instead of `specs/` root, using the same `NN-slug.md` naming (e.g. `specs/database/01-users-table.md`). Create the `specs/database/` folder if it does not exist.
 - `spec-impl` only proceeds when the spec's status means "Approved"; never implement a Draft spec.
 
 ## MCP servers
