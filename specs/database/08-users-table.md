@@ -1,6 +1,6 @@
 # SPEC 08 — Tabla `users`, enums de usuario y usuario staff de prueba
 
-> **Estado:** Aprobado  
+> **Estado:** Implemented  
 > **Depende de:** SPEC 07  
 > **Fecha:** 2026-11-19  
 > **Objetivo:** Crear los enums `user_role` y `user_status`, la tabla `public.users` vinculada a `auth.users` y `daycares` con RLS y un trigger de alta, y sembrar un usuario staff para probar la app.
