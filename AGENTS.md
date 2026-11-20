@@ -2,32 +2,9 @@
 
 ## This is NOT the Next.js you know
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
-
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 
 <!-- END:nextjs-agent-rules -->
-
-<!-- BEGIN:nextjs-agent-feedback -->
-
-## Report Next.js feedback
-
-The project owner enabled `experimental.agentFeedback`, authorizing this feedback pass. When enabled, `next dev` writes this block and restores it if removed. Commit `AGENTS.md` with your work to keep the tree clean.
-
-During the current user request, retain anonymized facts as feedback candidates for meaningful or recurring Next.js issues:
-
-- Crashes, hangs, OOMs, or unexpected slowness
-- Incorrect behavior, output, errors, or diagnostics
-- Missing, unclear, or conflicting documentation
-- Unexpected CLI, codemod, Skill, or upgrade behavior and non-obvious workarounds
-
-Continue the current user request without reporting immediately. Routine debugging is not feedback. Verify changes before retaining them as feedback candidates. Never retain code, logs, paths, URLs, secrets, personal information, or project-specific data.
-
-Retain qualifying friction even if it is later fixed or worked around; record the final outcome during the reporting pass.
-
-Before the final response, run one reporting pass. If candidates remain, from this file's directory run `npx --no-install next internal agent-feedback-instructions` once without piping or truncating its output. Follow its output or error guidance. If a network sandbox blocks it, retry with network access; if it still returns no output, continue normally.
-
-<!-- END:nextjs-agent-feedback -->
 
 # open-daycare
 
@@ -47,6 +24,91 @@ Daycare staff/family app scaffolded with `create-next-app`. `app/` is still the 
 - `next.config.ts` enables `cacheComponents` and `partialPrefetching`. Read `node_modules/next/dist/docs/01-app/01-getting-started/08-caching.md` and `01-app/02-guides/adopting-partial-prefetching.md` before adding data fetching or caching.
 - Tailwind v4 is wired as a Turbopack CSS loader through `@tailwindcss/turbopack`; there is no PostCSS or `tailwind.config` file. Add theme tokens in `app/globals.css` using `@theme`.
 - Import alias `@/*` maps to the repo root (`./*`), not `src/`.
+
+## Database integration (Next.js native patterns)
+
+Next.js recommends using a **Data Access Layer (DAL)** for database access in new projects. This is an internal library that centralizes how and when data is fetched, with proper authorization checks.
+
+### Recommended packages and patterns
+
+- **Data Access Layer (DAL):** Create a dedicated module (e.g., `lib/db/` or `data/`) that:
+  - Only runs on the server
+  - Performs authentication and authorization checks
+  - Returns safe, minimal Data Transfer Objects (DTOs)
+  - Centralizes all database logic
+
+- **`server-only` package:** Mark database modules with `import 'server-only'` to prevent accidental client-side execution. This causes a build error if the module is imported in client code.
+  ```bash
+  npm install server-only
+  ```
+
+- **Database client:** Since Server Components run on the server, you can safely use any database client or ORM (e.g., Supabase client, Drizzle, Prisma, or raw SQL). Place the client configuration in your DAL:
+  ```ts filename="lib/db/index.ts"
+  import 'server-only'
+  import { createClient } from '@supabase/supabase-js'
+  
+  export const db = createClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+  ```
+
+- **Query memoization:** Wrap database query functions with `React.cache()` to share results across multiple components within the same request:
+  ```ts filename="lib/db/users.ts"
+  import 'server-only'
+  import { cache } from 'react'
+  import { db } from './index'
+  
+  export const getUser = cache(async (id: string) => {
+    const { data } = await db.from('users').select().eq('id', id).single()
+    return data
+  })
+  ```
+
+- **Environment variables:** Only the DAL should access `process.env` for database credentials. Never expose database secrets to the client. Use `SUPABASE_SERVICE_ROLE_KEY` (server-only) for server-side operations, not `NEXT_PUBLIC_` prefixed variables.
+
+### Security best practices
+
+- **Authorization in DAL:** Always check authentication and authorization inside DAL functions, not just in pages or actions:
+  ```ts filename="lib/db/posts.ts"
+  import 'server-only'
+  import { auth } from '@/lib/auth'
+  import { db } from './index'
+  
+  export async function deletePost(postId: string) {
+    const session = await auth()
+    if (!session?.user) throw new Error('Unauthorized')
+    
+    const post = await db.from('posts').select().eq('id', postId).single()
+    if (post.data?.author_id !== session.user.id) {
+      throw new Error('Forbidden')
+    }
+    
+    await db.from('posts').delete().eq('id', postId)
+  }
+  ```
+
+- **Return minimal data:** Only return what the client needs, not full database records. Filter sensitive fields before returning DTOs.
+
+- **Server Actions delegation:** Keep `"use server"` actions thin—delegate database logic to the DAL:
+  ```ts filename="app/actions.ts"
+  'use server'
+  import { deletePost } from '@/lib/db/posts'
+  import { revalidatePath } from 'next/cache'
+  
+  export async function deletePostAction(postId: string) {
+    await deletePost(postId) // Auth + authz happen inside DAL
+    revalidatePath('/posts')
+  }
+  ```
+
+- **Supabase-specific:** Follow the Supabase section below for RLS policies, security, and migration patterns. The DAL should wrap Supabase calls with proper authorization checks.
+
+### Documentation references
+
+- Data fetching: `node_modules/next/dist/docs/01-app/01-getting-started/06-fetching-data.md`
+- Data security: `node_modules/next/dist/docs/01-app/02-guides/data-security.md`
+- Server Components: `node_modules/next/dist/docs/01-app/01-getting-started/05-server-and-client-components.md`
 
 ## Supabase
 
