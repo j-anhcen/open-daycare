@@ -1,95 +1,101 @@
 "use client";
 
-import { useState } from "react";
-import {
-  addKidModalData,
-  buildKidFromForm,
-  type AddKidFormValues,
-  type Kid,
-  type KidsPageData,
-} from "@/app/_data/kids";
+import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
+
 import { AddKidModal } from "@/components/kids/AddKidModal";
-import { KidCard } from "@/components/kids/KidCard";
+import { KidCard, type KidCardChild } from "@/components/kids/KidCard";
 import { KidsHeader } from "@/components/kids/KidsHeader";
 import { KidsSearch } from "@/components/kids/KidsSearch";
 
-type KidsBoardProps = {
-  data: KidsPageData;
+type KidsBoardRoom = {
+  id: string;
+  name: string;
 };
 
-type KidsSection = {
-  room: string;
-  kids: Kid[];
+type KidsBoardProps = {
+  rooms: KidsBoardRoom[];
+  kids: KidCardChild[];
 };
 
 function kidsCountLabel(count: number): string {
   return count === 1 ? "1 niño" : `${count} niños`;
 }
 
-// Sections follow the roomOptions order (Soles → Mar → Jardín) and only rooms
-// with at least one kid render. Added kids (newest first) precede the mock kids.
-function buildSections(addedKids: Kid[], kids: Kid[]): KidsSection[] {
-  return addKidModalData.roomOptions
-    .map((room) => ({
-      room,
-      kids: [
-        ...addedKids.filter((kid) => kid.roomLabel === room),
-        ...kids.filter((kid) => kid.roomLabel === room),
-      ],
-    }))
-    .filter((section) => section.kids.length > 0);
+function normalize(value: string): string {
+  return value.normalize("NFD").replace(/\p{Mark}/gu, "").toLowerCase();
 }
 
-export function KidsBoard({ data }: KidsBoardProps) {
-  const [addedKids, setAddedKids] = useState<Kid[]>([]);
+export function KidsBoard({ rooms, kids }: KidsBoardProps) {
+  const router = useRouter();
+  const [search, setSearch] = useState("");
   const [isAddKidModalOpen, setIsAddKidModalOpen] = useState(false);
+  const normalizedSearch = normalize(search.trim());
 
-  const sections = buildSections(addedKids, data.kids);
-
-  const openAddKidModal = () => setIsAddKidModalOpen(true);
-  const closeAddKidModal = () => setIsAddKidModalOpen(false);
-
-  const handleSaveKid = (values: AddKidFormValues) => {
-    const kid = buildKidFromForm(
-      values,
-      [...data.kids, ...addedKids],
-      addedKids.length,
-    );
-    setAddedKids((current) => [kid, ...current]);
+  const openAddKidModal = useCallback(() => setIsAddKidModalOpen(true), []);
+  const closeAddKidModal = useCallback(
+    () => setIsAddKidModalOpen(false),
+    [],
+  );
+  const handleChildCreated = useCallback(() => {
     setIsAddKidModalOpen(false);
-  };
+    router.refresh();
+  }, [router]);
+
+  const filteredChildren = normalizedSearch
+    ? kids.filter((child) =>
+        normalize(child.full_name).includes(normalizedSearch),
+      )
+    : kids;
 
   return (
     <div>
-      <KidsHeader eyebrowLabel={data.eyebrowLabel} onAddKid={openAddKidModal} />
-      <KidsSearch placeholder={data.searchPlaceholder} />
+      <KidsHeader eyebrowLabel="GESTIÓN" onAddKid={openAddKidModal} />
+      <KidsSearch
+        placeholder="Buscar niño…"
+        value={search}
+        onChange={setSearch}
+      />
 
-      {sections.map((section, index) => (
-        <section
-          key={section.room}
-          className={index > 0 ? "mt-[28px]" : undefined}
-        >
-          <div className="mb-[14px] flex items-center gap-3">
-            <span className="text-[12.5px] font-extrabold tracking-[0.8px] text-ink">
-              SALA {section.room.toUpperCase()}
-            </span>
-            <span className="text-[13px] text-muted-light">
-              {kidsCountLabel(section.kids.length)}
-            </span>
-            <span className="h-px flex-1 bg-[#E7DAC8]" />
-          </div>
-          <div className="grid grid-cols-1 gap-[14px] md:grid-cols-2">
-            {section.kids.map((kid) => (
-              <KidCard key={kid.id} kid={kid} />
-            ))}
-          </div>
-        </section>
-      ))}
+      {rooms.map((room, index) => {
+        const roomChildren = filteredChildren.filter(
+          (child) => child.room_id === room.id,
+        );
+
+        return (
+          <section
+            key={room.id}
+            className={index > 0 ? "mt-[28px]" : undefined}
+          >
+            <div className="mb-[14px] flex items-center gap-3">
+              <span className="text-[12.5px] font-extrabold tracking-[0.8px] text-ink">
+                SALA {room.name.toUpperCase()}
+              </span>
+              <span className="text-[13px] text-muted-light">
+                {kidsCountLabel(roomChildren.length)}
+              </span>
+              <span className="h-px flex-1 bg-[#E7DAC8]" />
+            </div>
+            {roomChildren.length === 0 ? (
+              <p className="rounded-[18px] border border-dashed border-line bg-surface px-4 py-5 text-center text-[13px] text-muted-light">
+                No hay niños en esta sala.
+              </p>
+            ) : (
+              <div className="grid grid-cols-1 gap-[14px] md:grid-cols-2">
+                {roomChildren.map((child) => (
+                  <KidCard key={child.id} child={child} />
+                ))}
+              </div>
+            )}
+          </section>
+        );
+      })}
 
       <AddKidModal
         isOpen={isAddKidModalOpen}
+        rooms={rooms}
         onClose={closeAddKidModal}
-        onSave={handleSaveKid}
+        onCreated={handleChildCreated}
       />
     </div>
   );

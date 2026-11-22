@@ -1,22 +1,22 @@
 # components/kids
 
-Kids screen presentation components (`/kids` and `/kids/[id]`), fed by
-`app/_data/kids.ts`:
+Presentation components for `/kids`, `/kids/new` and `/kids/[id]`. All screens
+read real Supabase data through the DAL (`lib/dal/rooms.ts`,
+`lib/dal/children.ts`); the old mock module `app/_data/kids.ts` was removed.
 
-- `KidsBoard.tsx` — client board for `/kids`: owns the “Agregar niño” modal open state and the in-memory `addedKids` list (lost on reload), and composes header, search and one section per room in `addKidModalData.roomOptions` order (only rooms with kids; added kids go first in their section; “N niño(s)” counters are derived).
-- `KidsHeader.tsx` — “GESTIÓN / Niños” heading with the “Agregar niño” CTA button (`onAddKid` prop opens the modal).
-- `KidsSearch.tsx` — visual-only search box (“Buscar niño…”): renders an input but performs no filtering.
-- `KidCard.tsx` — list card linking to the kid's profile: avatar, name, age + linked-parents meta line, and a trailing chip group — one chip per allergy label plus “VINCULAR” when the kid has no linked parents, or a chevron when there are parents and no allergies. Includes the mockup hover (border `#F2A78E`, 2px lift).
-- `AddKidModal.tsx` — always-mounted “Agregar niño” dialog over `/kids` (fade + subtle scale ~200ms, `inert` when closed, Escape/overlay/“Cancelar” close, body scroll lock, `role="dialog"` + `aria-modal` + `aria-labelledby`): five fields styled after `agregar-nino.dc.html` (FECHA + SALA share a row on `>= sm` and stack below), native SALA select with disabled placeholder, masked “dd/mm/aaaa” birth date (digits only, auto slashes, pasted content sanitized) and inline validation against `addKidModalData.errorMessages` (calendar-invalid and future dates rejected; errors clear on edit; focus moves to the first invalid field). A valid “Guardar” passes the values to `onSave` and resets the form.
-- `ProfileHeader.tsx` — profile identity block (84px avatar, name, “edad · Sala X”, placeholder “Editar” button). The “Volver a Niños” link is rendered by the page above the two-column layout so the identity block stays inside the left column exactly as the mockup lays it out.
-- `AllergyNoteCard.tsx` — “Alergias y notas” warning box; the page renders it only when the kid has an allergy note.
-- `ProfileDetailsCard.tsx` — “Fecha de nacimiento / Sala / Ingreso” detail rows.
-- `LinkedParentsCard.tsx` — “PADRES VINCULADOS”: solid parent avatars, “rol · estado” line, ACTIVA/PENDIENTE status badges and the “Vincular otro padre” button (`onLinkParent`, rendered even for kids without linked parents).
-- `KidProfileAside.tsx` — client wrapper for the profile's right column: owns the “Vincular padre” modal open state and the in-memory `linkedParents` list, composes the “Resumen del día” placeholder, `LinkedParentsCard` and `LinkParentModal`. The page stays a server component and only passes `kid`.
-- `LinkParentModal.tsx` — always-mounted “Vincular padre” dialog over `/kids/[id]` (no route change; fade + subtle scale ~200ms, `inert` when closed, Escape/overlay/X close, body scroll lock, `role="dialog"` + `aria-modal` + `aria-labelledby`): header subtitle derived from `kid.name`, info box using the first name, NOMBRE/EMAIL fields, unique PARENTESCO radio group with “Mamá” preselected, fixed `7K4P9` invitation code box and “Enviar invitación” CTA. Inline validation against `linkParentModalData.errorMessages` (required name/email, invalid email rejected; errors clear on edit; focus moves to the first invalid field). A valid submit derives a pending parent, closes and resets the form.
+- `KidsBoard.tsx` — client board for `/kids`: one section per room (including empty rooms), per-room counters, empty states, a live name filter (accent-insensitive) and the state that opens the add-child modal over the list.
+- `KidsHeader.tsx` — "GESTIÓN / Niños" heading with the "Agregar niño" button that opens the modal without changing the URL.
+- `KidsSearch.tsx` — controlled search input ("Buscar niño…") wired to `KidsBoard`.
+- `KidCard.tsx` — list card linking to the child's UUID profile: avatar, name, calculated age and allergy chips (translated to Spanish).
+- `AddKidModal.tsx` — accessible overlay (`role="dialog"`, Escape/overlay close, scroll lock) that hosts `AddChildForm`; opening it a second time starts with a fresh form.
+- `AddChildForm.tsx` — client form with five fields and inline errors via `useActionState`; submits to `createChildAction`. Inside the modal it reports success through `onCreated`; on `/kids/new` it navigates back to `/kids`.
+- `ProfileHeader.tsx` — profile identity block (avatar, name, "age · Sala X", non-functional "Editar" placeholder).
+- `AllergyNoteCard.tsx` — "Alergias y notas" warning box; rendered only when the child has allergy tags or medical notes.
+- `ProfileDetailsCard.tsx` — "Fecha de nacimiento / Sala / Ingreso" detail rows from real dates.
+- `LinkedParentsCard.tsx` — "PADRES VINCULADOS" panel with the pending parents added in the current session and the "Vincular otro padre" button that opens the modal.
+- `KidProfileAside.tsx` — client right column: non-functional "Resumen del día" placeholder, `LinkedParentsCard` and `LinkParentModal`; owns the modal state and the in-memory parent list.
+- `LinkParentModal.tsx` — "Vincular padre" modal over the profile (no URL change): accessible overlay, inline validation, invitation code and a pending parent on submit. Copy/types live in `lib/link-parent.ts`.
 
-Kids added through the modal are derived by `buildKidFromForm` (`app/_data/kids.ts`)
-and live in memory only: their `/kids/[id]` profile links resolve to the 404 page,
-and navigating or reloading brings back the eight mock kids. Parents added through
-the “Vincular padre” modal are derived by `buildLinkedParentFromForm` and also live
-in memory only: reloading or navigating restores the kid's mock parents.
+Editing, day summaries and photo uploads are placeholders for future specs.
+Shared presentation helpers live in `lib/age.ts`, `lib/allergies.ts`,
+`lib/avatar.ts` and `lib/link-parent.ts`.

@@ -1,17 +1,18 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { FormEvent } from "react";
+
 import {
   linkParentModalData,
-  type Kid,
   type LinkParentFormValues,
   type LinkParentModalData,
-} from "@/app/_data/kids";
+} from "@/lib/link-parent";
 import { CloseIcon, InfoIcon, SendIcon } from "@/components/shared/icons";
 
 type LinkParentModalProps = {
   isOpen: boolean;
-  kid: Kid;
+  childName: string;
   onClose: () => void;
   onSubmit: (values: LinkParentFormValues) => void;
 };
@@ -70,7 +71,7 @@ function validateLinkParentForm(
 
 export function LinkParentModal({
   isOpen,
-  kid,
+  childName,
   onClose,
   onSubmit,
 }: LinkParentModalProps) {
@@ -79,7 +80,7 @@ export function LinkParentModal({
   const nameInputRef = useRef<HTMLInputElement | null>(null);
   const emailInputRef = useRef<HTMLInputElement | null>(null);
   const data = linkParentModalData;
-  const firstName = kid.name.split(" ")[0];
+  const firstName = childName.split(" ")[0];
 
   const handleClose = useCallback(() => {
     setValues(EMPTY_FORM_VALUES);
@@ -101,6 +102,7 @@ export function LinkParentModal({
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     document.addEventListener("keydown", onKeyDown);
+    nameInputRef.current?.focus();
 
     return () => {
       document.removeEventListener("keydown", onKeyDown);
@@ -108,7 +110,7 @@ export function LinkParentModal({
     };
   }, [isOpen, handleClose]);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const formErrors = validateLinkParentForm(values, data.errorMessages);
@@ -160,7 +162,7 @@ export function LinkParentModal({
               </h2>
               <p className="text-[13px] text-muted-light">
                 {data.subtitlePrefix}
-                {kid.name}
+                {childName}
               </p>
             </div>
             <button

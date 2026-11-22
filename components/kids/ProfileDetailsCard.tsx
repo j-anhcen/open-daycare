@@ -1,19 +1,23 @@
-import type { Kid } from "@/app/_data/kids";
+import { formatMonthYear, formatShortDate } from "@/lib/age";
+import type { ChildWithRoom } from "@/lib/dal/children";
 
 type ProfileDetailsCardProps = {
-  kid: Kid;
+  child: ChildWithRoom;
 };
 
-function detailRows(kid: Kid): { label: string; value: string }[] {
+function detailRows(child: ChildWithRoom): { label: string; value: string }[] {
   return [
-    { label: "Fecha de nacimiento", value: kid.birthDateLabel },
-    { label: "Sala", value: kid.roomLabel },
-    { label: "Ingreso", value: kid.enrollmentLabel },
+    {
+      label: "Fecha de nacimiento",
+      value: formatShortDate(child.birth_date),
+    },
+    { label: "Sala", value: `Sala ${child.rooms?.name ?? ""}` },
+    { label: "Ingreso", value: formatMonthYear(child.enrolled_at) },
   ];
 }
 
-export function ProfileDetailsCard({ kid }: ProfileDetailsCardProps) {
-  const rows = detailRows(kid);
+export function ProfileDetailsCard({ child }: ProfileDetailsCardProps) {
+  const rows = detailRows(child);
 
   return (
     <div className="overflow-hidden rounded-[16px] border border-line bg-surface">

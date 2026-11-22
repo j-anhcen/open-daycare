@@ -1,3 +1,5 @@
+"use client";
+
 import { PlusIcon } from "@/components/shared/icons";
 
 type KidsHeaderProps = {
