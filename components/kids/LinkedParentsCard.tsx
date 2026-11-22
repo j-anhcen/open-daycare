@@ -1,9 +1,9 @@
-import type { Kid, LinkedParent, ParentStatus } from "@/app/_data/kids";
 import { Avatar } from "@/components/shared/Avatar";
 import { PlusIcon } from "@/components/shared/icons";
+import type { LinkedParent, ParentStatus } from "@/lib/link-parent";
 
 type LinkedParentsCardProps = {
-  kid: Kid;
+  parents: LinkedParent[];
   onLinkParent: () => void;
 };
 
@@ -50,7 +50,7 @@ function ParentRow({ parent }: { parent: LinkedParent }) {
 }
 
 export function LinkedParentsCard({
-  kid,
+  parents,
   onLinkParent,
 }: LinkedParentsCardProps) {
   return (
@@ -59,10 +59,20 @@ export function LinkedParentsCard({
         PADRES VINCULADOS
       </div>
       <div className="flex flex-col gap-[14px]">
-        {kid.parents.map((parent) => (
-          <ParentRow key={parent.name} parent={parent} />
-        ))}
-        <button type="button" onClick={onLinkParent} className="flex items-center gap-3 pt-2">
+        {parents.length === 0 ? (
+          <p className="text-[14px] leading-[1.5] text-muted-light">
+            La vinculación de padres estará próximamente
+          </p>
+        ) : (
+          parents.map((parent) => (
+            <ParentRow key={parent.name} parent={parent} />
+          ))
+        )}
+        <button
+          type="button"
+          onClick={onLinkParent}
+          className="flex items-center gap-3 pt-2"
+        >
           <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full border-[1.5px] border-dashed border-[#D8CBBA] text-muted-faint">
             <PlusIcon className="h-[18px] w-[18px]" strokeWidth={2.2} />
           </span>

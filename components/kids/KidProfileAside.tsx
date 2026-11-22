@@ -1,51 +1,50 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import {
-  buildLinkedParentFromForm,
-  type Kid,
-  type LinkedParent,
-  type LinkParentFormValues,
-} from "@/app/_data/kids";
+
 import { LinkParentModal } from "@/components/kids/LinkParentModal";
 import { LinkedParentsCard } from "@/components/kids/LinkedParentsCard";
 import { SunIcon } from "@/components/shared/icons";
+import {
+  buildLinkedParentFromForm,
+  type LinkedParent,
+  type LinkParentFormValues,
+} from "@/lib/link-parent";
 
 type KidProfileAsideProps = {
-  kid: Kid;
+  childName: string;
 };
 
-export function KidProfileAside({ kid }: KidProfileAsideProps) {
+export function KidProfileAside({ childName }: KidProfileAsideProps) {
   const [isLinkParentOpen, setIsLinkParentOpen] = useState(false);
-  const [linkedParents, setLinkedParents] = useState<LinkedParent[]>(kid.parents);
+  const [linkedParents, setLinkedParents] = useState<LinkedParent[]>([]);
 
   const closeLinkParentModal = useCallback(() => {
     setIsLinkParentOpen(false);
   }, []);
 
   const handleSubmitLinkParent = (values: LinkParentFormValues) => {
-    const parent = buildLinkedParentFromForm(values, kid);
-    setLinkedParents((current) => [...current, parent]);
+    setLinkedParents((current) => [...current, buildLinkedParentFromForm(values)]);
   };
 
   return (
     <div className="flex w-[300px] flex-none flex-col gap-[14px]">
-      <a
-        href="#"
+      <button
+        type="button"
         className="flex w-full items-center justify-center gap-[9px] rounded-[14px] bg-ink p-[13px] text-[15px] font-extrabold text-white"
       >
         <SunIcon className="h-[18px] w-[18px]" strokeWidth={2} />
         Resumen del día
-      </a>
+      </button>
 
       <LinkedParentsCard
-        kid={{ ...kid, parents: linkedParents }}
+        parents={linkedParents}
         onLinkParent={() => setIsLinkParentOpen(true)}
       />
 
       <LinkParentModal
         isOpen={isLinkParentOpen}
-        kid={kid}
+        childName={childName}
         onClose={closeLinkParentModal}
         onSubmit={handleSubmitLinkParent}
       />

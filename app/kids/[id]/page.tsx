@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { Suspense } from "react";
-import { getKidById, kidsPageData } from "@/app/_data/kids";
+
 import { AllergyNoteCard } from "@/components/kids/AllergyNoteCard";
 import { KidProfileAside } from "@/components/kids/KidProfileAside";
 import { ProfileDetailsCard } from "@/components/kids/ProfileDetailsCard";
@@ -12,37 +13,68 @@ import {
   CurrentUserSidebar,
 } from "@/components/layout/CurrentUserNavigation";
 import { ArrowLeftIcon } from "@/components/shared/icons";
+import { getChildById, type ChildWithRoom } from "@/lib/dal/children";
+import { reverseAllergyLabel } from "@/lib/allergies";
 
-// Opt out of instant-navigation validation for this route: the page reads
-// `params` at the render root (data is fully static and prerendered via
-// generateStaticParams), so a blocking navigation is the intended behavior.
-// Revisit with a <Suspense> shell if this route needs instant navigation.
+// The shared layout contains a Client Component that reads usePathname()
+// outside a Suspense boundary, and this route resolves a dynamic UUID param.
+// Both need request-time rendering, so this segment stays blocking.
 export const instant = false;
-
-export function generateStaticParams() {
-  return kidsPageData.kids.map((kid) => ({ id: kid.id }));
-}
 
 export async function generateMetadata(
   props: PageProps<"/kids/[id]">,
 ): Promise<Metadata> {
+  await connection();
   const { id } = await props.params;
-  const kid = getKidById(id);
+  const child = await getChildById(id);
 
-  if (!kid) {
+  if (!child) {
     notFound();
   }
 
-  return { title: `${kid.name} · OpenDayCare` };
+  return { title: `${child.full_name} · OpenDayCare` };
+}
+
+function buildAllergyNote(child: ChildWithRoom): string | null {
+  const parts: string[] = [];
+
+  if (child.allergy_tags.length > 0) {
+    parts.push(
+      `Alergias: ${child.allergy_tags.map(reverseAllergyLabel).join(", ")}`,
+    );
+  }
+  if (child.medical_notes) {
+    parts.push(child.medical_notes);
+  }
+
+  return parts.length > 0 ? parts.join(". ") : null;
+}
+
+async function KidProfileContent({ id }: { id: string }) {
+  await connection();
+  const child = await getChildById(id);
+
+  if (!child) {
+    notFound();
+  }
+
+  const allergyNote = buildAllergyNote(child);
+
+  return (
+    <div className="flex flex-wrap items-start gap-[26px]">
+      <div className="flex min-w-[300px] flex-1 flex-col gap-[18px]">
+        <ProfileHeader child={child} />
+        {allergyNote ? <AllergyNoteCard note={allergyNote} /> : null}
+        <ProfileDetailsCard child={child} />
+      </div>
+
+      <KidProfileAside childName={child.full_name} />
+    </div>
+  );
 }
 
 export default async function KidProfilePage(props: PageProps<"/kids/[id]">) {
   const { id } = await props.params;
-  const kid = getKidById(id);
-
-  if (!kid) {
-    notFound();
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -68,17 +100,9 @@ export default async function KidProfilePage(props: PageProps<"/kids/[id]">) {
               Volver a Niños
             </Link>
 
-            <div className="flex flex-wrap items-start gap-[26px]">
-              <div className="flex min-w-[300px] flex-1 flex-col gap-[18px]">
-                <ProfileHeader kid={kid} />
-                {kid.allergyNote ? (
-                  <AllergyNoteCard note={kid.allergyNote} />
-                ) : null}
-                <ProfileDetailsCard kid={kid} />
-              </div>
-
-              <KidProfileAside kid={kid} />
-            </div>
+            <Suspense fallback={null}>
+              <KidProfileContent id={id} />
+            </Suspense>
           </div>
         </main>
       </div>

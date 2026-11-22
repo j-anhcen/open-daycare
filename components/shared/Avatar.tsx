@@ -1,4 +1,4 @@
-import type { AvatarColorKey, ParentAvatarColorKey } from "@/app/_data/kids";
+import type { AvatarColorKey, ParentAvatarColorKey } from "@/lib/avatar";
 
 export type AvatarSize = 40 | 48 | 84;
 
