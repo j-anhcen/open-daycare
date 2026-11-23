@@ -11,7 +11,7 @@ export type LinkedParent = {
   avatarColor: ParentAvatarColorKey;
 };
 
-export type ParentRelationship = "mom" | "dad" | "tutor";
+export type ParentRelationship = "mother" | "father" | "tutor";
 
 export type LinkParentFormValues = {
   name: string;
@@ -29,9 +29,6 @@ export type LinkParentModalData = {
   emailPlaceholder: string;
   relationshipLabel: string;
   relationshipOptions: { value: ParentRelationship; label: string }[];
-  codeLabel: string;
-  invitationCode: string;
-  expiryLabel: string;
   submitLabel: string;
   errorMessages: {
     nameRequired: string;
@@ -51,13 +48,10 @@ export const linkParentModalData: LinkParentModalData = {
   emailPlaceholder: "correo@ejemplo.com",
   relationshipLabel: "PARENTESCO",
   relationshipOptions: [
-    { value: "mom", label: "Mamá" },
-    { value: "dad", label: "Papá" },
+    { value: "mother", label: "Mamá" },
+    { value: "father", label: "Papá" },
     { value: "tutor", label: "Tutor/a" },
   ],
-  codeLabel: "CÓDIGO DE INVITACIÓN",
-  invitationCode: "7K4P9",
-  expiryLabel: "Vence en 7 días",
   submitLabel: "Enviar invitación",
   errorMessages: {
     nameRequired: "Ingresá el nombre del padre o madre.",
@@ -66,28 +60,9 @@ export const linkParentModalData: LinkParentModalData = {
   },
 };
 
-/**
- * Derives the pending `LinkedParent` row for a valid "Vincular padre" submission.
- * The email is validated in the form but never persisted.
- */
-export function buildLinkedParentFromForm(
-  values: LinkParentFormValues,
-): LinkedParent {
-  const name = values.name.trim();
-  const relationship = linkParentModalData.relationshipOptions.find(
-    (option) => option.value === values.relationship,
-  );
-
-  if (!relationship) {
-    throw new Error(`Invalid parent relationship: ${values.relationship}`);
-  }
-
-  return {
-    name,
-    initial: name.charAt(0).toUpperCase(),
-    roleLabel: relationship.label,
-    statusLabel: "invitación enviada",
-    status: "pending",
-    avatarColor: values.relationship === "mom" ? "purple" : "blue",
-  };
+/** Returns the formal Spanish label for a stored relationship value. */
+export function relationshipLabel(relationship: ParentRelationship): string {
+  if (relationship === "mother") return "Madre";
+  if (relationship === "father") return "Padre";
+  return "Tutor";
 }

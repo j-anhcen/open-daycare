@@ -3,18 +3,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 
+import { sendInvitationAction } from "@/app/actions/invitations";
+import { CloseIcon, InfoIcon, SendIcon } from "@/components/shared/icons";
 import {
   linkParentModalData,
   type LinkParentFormValues,
   type LinkParentModalData,
 } from "@/lib/link-parent";
-import { CloseIcon, InfoIcon, SendIcon } from "@/components/shared/icons";
 
 type LinkParentModalProps = {
   isOpen: boolean;
+  childId: string;
   childName: string;
   onClose: () => void;
-  onSubmit: (values: LinkParentFormValues) => void;
 };
 
 type LinkParentFormErrors = {
@@ -22,10 +23,12 @@ type LinkParentFormErrors = {
   email?: string;
 };
 
+type SubmissionStatus = "idle" | "submitting" | "success" | "error";
+
 const EMPTY_FORM_VALUES: LinkParentFormValues = {
   name: "",
   email: "",
-  relationship: "mom",
+  relationship: "mother",
 };
 
 const EMPTY_FORM_ERRORS: LinkParentFormErrors = {};
@@ -71,20 +74,25 @@ function validateLinkParentForm(
 
 export function LinkParentModal({
   isOpen,
+  childId,
   childName,
   onClose,
-  onSubmit,
 }: LinkParentModalProps) {
   const [values, setValues] = useState<LinkParentFormValues>(EMPTY_FORM_VALUES);
   const [errors, setErrors] = useState<LinkParentFormErrors>(EMPTY_FORM_ERRORS);
+  const [status, setStatus] = useState<SubmissionStatus>("idle");
+  const [serverError, setServerError] = useState<string | null>(null);
   const nameInputRef = useRef<HTMLInputElement | null>(null);
   const emailInputRef = useRef<HTMLInputElement | null>(null);
   const data = linkParentModalData;
   const firstName = childName.split(" ")[0];
+  const isSubmitting = status === "submitting";
 
   const handleClose = useCallback(() => {
     setValues(EMPTY_FORM_VALUES);
     setErrors(EMPTY_FORM_ERRORS);
+    setStatus("idle");
+    setServerError(null);
     onClose();
   }, [onClose]);
 
@@ -110,8 +118,15 @@ export function LinkParentModal({
     };
   }, [isOpen, handleClose]);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (isSubmitting) {
+      return;
+    }
+
+    setStatus("idle");
+    setServerError(null);
 
     const formErrors = validateLinkParentForm(values, data.errorMessages);
     setErrors(formErrors);
@@ -125,7 +140,18 @@ export function LinkParentModal({
       return;
     }
 
-    onSubmit(values);
+    setStatus("submitting");
+    setServerError(null);
+
+    const result = await sendInvitationAction(childId, childName, values);
+
+    if (result.error) {
+      setStatus("error");
+      setServerError(result.error);
+      return;
+    }
+
+    setStatus("success");
     handleClose();
   };
 
@@ -276,25 +302,27 @@ export function LinkParentModal({
               </div>
             </fieldset>
 
-            <div className="mb-5 rounded-[16px] border-[1.5px] border-dashed border-code-box-border bg-consent-box-bg p-[18px] text-center">
-              <div className="mb-2 text-xs font-extrabold tracking-[0.7px] text-code-label">
-                {data.codeLabel}
-              </div>
-              <div className="font-display text-[34px] font-semibold tracking-[7px] text-consent-box-text">
-                {data.invitationCode}
-              </div>
-              <div className="mt-[6px] text-[13px] text-code-label">
-                {data.expiryLabel}
-              </div>
-            </div>
-
             <button
               type="submit"
-              className="flex w-full items-center justify-center gap-[9px] rounded-[14px] p-[14px] text-[15.5px] font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)] [background:linear-gradient(180deg,#F4977E,#EE8164)]"
+              disabled={isSubmitting}
+              className="flex w-full items-center justify-center gap-[9px] rounded-[14px] p-[14px] text-[15.5px] font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)] [background:linear-gradient(180deg,#F4977E,#EE8164)] disabled:cursor-not-allowed disabled:opacity-70"
             >
-              <SendIcon className="h-[19px] w-[19px]" />
-              {data.submitLabel}
+              {isSubmitting ? (
+                <span
+                  aria-hidden="true"
+                  className="h-[19px] w-[19px] animate-spin rounded-full border-2 border-white/40 border-t-white"
+                />
+              ) : (
+                <SendIcon className="h-[19px] w-[19px]" />
+              )}
+              {isSubmitting ? "Enviando…" : data.submitLabel}
             </button>
+
+            {status === "error" && serverError !== null && (
+              <p role="alert" className={fieldErrorTextClass}>
+                {serverError}
+              </p>
+            )}
           </form>
         </div>
       </div>

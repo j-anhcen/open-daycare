@@ -6,26 +6,28 @@ import { LinkParentModal } from "@/components/kids/LinkParentModal";
 import { LinkedParentsCard } from "@/components/kids/LinkedParentsCard";
 import { SunIcon } from "@/components/shared/icons";
 import {
-  buildLinkedParentFromForm,
-  type LinkedParent,
-  type LinkParentFormValues,
-} from "@/lib/link-parent";
+  invitationsToParentRows,
+  type InvitationDto,
+} from "@/lib/invitations";
 
 type KidProfileAsideProps = {
+  childId: string;
   childName: string;
+  invitations: InvitationDto[];
 };
 
-export function KidProfileAside({ childName }: KidProfileAsideProps) {
+export function KidProfileAside({
+  childId,
+  childName,
+  invitations,
+}: KidProfileAsideProps) {
   const [isLinkParentOpen, setIsLinkParentOpen] = useState(false);
-  const [linkedParents, setLinkedParents] = useState<LinkedParent[]>([]);
 
   const closeLinkParentModal = useCallback(() => {
     setIsLinkParentOpen(false);
   }, []);
 
-  const handleSubmitLinkParent = (values: LinkParentFormValues) => {
-    setLinkedParents((current) => [...current, buildLinkedParentFromForm(values)]);
-  };
+  const parents = invitationsToParentRows(invitations);
 
   return (
     <div className="flex w-[300px] flex-none flex-col gap-[14px]">
@@ -38,15 +40,15 @@ export function KidProfileAside({ childName }: KidProfileAsideProps) {
       </button>
 
       <LinkedParentsCard
-        parents={linkedParents}
+        parents={parents}
         onLinkParent={() => setIsLinkParentOpen(true)}
       />
 
       <LinkParentModal
         isOpen={isLinkParentOpen}
+        childId={childId}
         childName={childName}
         onClose={closeLinkParentModal}
-        onSubmit={handleSubmitLinkParent}
       />
     </div>
   );
