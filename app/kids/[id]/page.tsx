@@ -14,6 +14,7 @@ import {
 } from "@/components/layout/CurrentUserNavigation";
 import { ArrowLeftIcon } from "@/components/shared/icons";
 import { getChildById, type ChildWithRoom } from "@/lib/dal/children";
+import { getInvitationsByChildId } from "@/lib/dal/invitations";
 import { reverseAllergyLabel } from "@/lib/allergies";
 
 // The shared layout contains a Client Component that reads usePathname()
@@ -59,6 +60,7 @@ async function KidProfileContent({ id }: { id: string }) {
   }
 
   const allergyNote = buildAllergyNote(child);
+  const invitations = await getInvitationsByChildId(child.id);
 
   return (
     <div className="flex flex-wrap items-start gap-[26px]">
@@ -68,7 +70,11 @@ async function KidProfileContent({ id }: { id: string }) {
         <ProfileDetailsCard child={child} />
       </div>
 
-      <KidProfileAside childName={child.full_name} />
+      <KidProfileAside
+        childId={child.id}
+        childName={child.full_name}
+        invitations={invitations}
+      />
     </div>
   );
 }
