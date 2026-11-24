@@ -6,25 +6,40 @@ import { redirect } from "next/navigation";
 import { activationPageData } from "@/app/_data/auth";
 import { verifySession } from "@/lib/dal";
 import { generateInvitationCode } from "@/lib/invitation-code";
-import type { LinkParentFormValues } from "@/lib/link-parent";
+import {
+  isValidEmail,
+  type LinkParentFormValues,
+  type ParentRelationship,
+} from "@/lib/link-parent";
 import { resend } from "@/lib/resend";
 import { createServiceClient } from "@/lib/supabase/service";
 
 export type SendInvitationResult = { error?: string; success?: boolean };
 
+/** Hardens the relationship radio value coming from the form payload. */
+function parseRelationship(raw: string): ParentRelationship {
+  return raw === "father" || raw === "tutor" ? raw : "mother";
+}
+
 export async function sendInvitationAction(
   childId: string,
   childName: string,
-  values: LinkParentFormValues,
+  _prevState: SendInvitationResult | undefined,
+  formData: FormData,
 ): Promise<SendInvitationResult> {
   const session = await verifySession();
+  const values: LinkParentFormValues = {
+    name: String(formData.get("name") ?? ""),
+    email: String(formData.get("email") ?? ""),
+    relationship: parseRelationship(String(formData.get("relationship") ?? "")),
+  };
   const name = values.name.trim();
   const email = values.email.trim();
 
   if (!name || !email) {
     return { error: "Completá nombre y correo." };
   }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!isValidEmail(email)) {
     return { error: "Correo inválido." };
   }
 

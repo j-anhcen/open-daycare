@@ -1,3 +1,5 @@
+import type { AvatarColorKey } from "@/lib/avatar";
+
 export type PostType =
   | "achievement"
   | "activity"
@@ -7,11 +9,24 @@ export type PostType =
   | "photo"
   | "encouragement";
 
-export type PostAudience = {
+/** Whole-room audience chip (e.g. "Toda la sala"): no avatar circle. */
+export type RoomAudience = {
   id: string;
   label: string;
-  initial?: string;
+  initial?: undefined;
+  color?: undefined;
 };
+
+/** Child audience chip. `color` pins the avatar palette instead of deriving it
+ * from the name, so the compose modal matches the mockups exactly. */
+export type ChildAudience = {
+  id: string;
+  label: string;
+  initial: string;
+  color: AvatarColorKey;
+};
+
+export type PostAudience = RoomAudience | ChildAudience;
 
 export type PostTypeOption = { value: PostType; label: string };
 
@@ -128,9 +143,9 @@ export const createPostModalData: CreatePostModalData = {
   publishLabel: "Publicar",
   recipientsLabel: "PARA",
   recipients: [
-    { id: "mateo", label: "Mateo", initial: "M" },
-    { id: "sofia", label: "Sofía", initial: "S" },
-    { id: "benjamin", label: "Benjamín", initial: "B" },
+    { id: "mateo", label: "Mateo", initial: "M", color: "blue" },
+    { id: "sofia", label: "Sofía", initial: "S", color: "pink" },
+    { id: "benjamin", label: "Benjamín", initial: "B", color: "green" },
     { id: "all", label: "Toda la sala" },
   ],
   typeLabel: "TIPO",

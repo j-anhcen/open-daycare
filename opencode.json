@@ -1,5 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "formatter": true,
   "lsp": true,
   "references": {
     "db-schema": {
@@ -23,6 +24,13 @@
           "@playwright/mcp@latest"
         ]
       }
+    }
+  },
+  "agents": {
+    "react-best-practices": {
+      "description": "Audit and refactor React files to follow React 19 best practices. Uses Context7 to consult the latest official documentation, then applies the fixes directly. Covers hooks (useEffect, useMemo, useCallback, useRef), performance and rendering, Server/Client Components, state and props patterns, component reuse patterns, and TypeScript typing.",
+      "mode": "subagent",
+      "prompt": "{file:./.opencode/agents/react-best-practices.md}"
     }
   }
 }

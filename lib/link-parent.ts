@@ -66,3 +66,13 @@ export function relationshipLabel(relationship: ParentRelationship): string {
   if (relationship === "father") return "Padre";
   return "Tutor";
 }
+
+/**
+ * Email validation shared by the LinkParentModal client form and the
+ * `sendInvitationAction` server action, so both stay in sync.
+ */
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export function isValidEmail(email: string): boolean {
+  return EMAIL_PATTERN.test(email);
+}
