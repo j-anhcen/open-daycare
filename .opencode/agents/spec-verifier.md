@@ -1,6 +1,6 @@
 ---
 description: Verificador de criterios de aceptación de specs. Revisa la implementación de un spec de specs/, corrige lo que falle, marca los checks del "Acceptance criteria" y actualiza el Estado. Usa Context7 para comprobar recomendaciones de Next.js y Playwright (visión) para comparar pantallas contra los mockups. Indícale el número o slug del spec (p. ej. "verifica el spec 01").
-mode: all
+mode: subagent
 model: opencode/nemotron-3.5-super-vl-free
 color: "#22c55e"
 permissions:
