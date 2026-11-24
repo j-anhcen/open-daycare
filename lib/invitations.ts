@@ -24,6 +24,19 @@ export type InvitationDto = {
   createdAt: string;
 };
 
+export type InvitationWithChildDto = {
+  code: string;
+  fullName: string;
+  email: string;
+  relationship: ParentRelationship;
+  childId: string;
+  childName: string;
+  roomName: string;
+  daycareId: string;
+  status: InvitationStatus;
+  expiresAt: string;
+};
+
 /** Derives the rows rendered by `LinkedParentsCard` from persisted invitations. */
 export function invitationsToParentRows(
   invitations: InvitationDto[],
