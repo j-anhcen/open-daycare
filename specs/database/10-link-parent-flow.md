@@ -18,9 +18,9 @@
 - **Client de Resend:** `lib/resend.ts` (`'server-only'`) que instancia `new Resend(process.env.RESEND_API_KEY)`. La API key ya existe en `.env`.
 - **Variables de entorno nuevas:** `INVITATION_URL` (sin prefijo `NEXT_PUBLIC_`, solo server) en `.env.local`.
 - **Parentesco unificado:** el tipo `ParentRelationship` en `lib/link-parent.ts` cambia de `"mom" | "dad" | "tutor"` a `"mother" | "father" | "tutor"`. Las opciones de la UI muestran `Mamá` / `Papá` / `Tutor/a`. Los valores coinciden con el enum de la DB, así que no se necesita mapeo de conversión. El helper `relationshipLabel(rel: ParentRelationship): string` devuelve el label en español (`Madre`/`Padre`/`Tutor`).
-- **Server Action de envío:** `app/actions/invitations.ts` con `sendInvitationAction(childId, formValues)`:
+- **Server Action de envío:** `app/actions/invitations.ts` con `sendInvitationAction(childId, childName, prevState, formData)` (patrón `useActionState`, como `acceptInvitationAction`):
   1. Verifica sesión con `verifySession()` (DAL de SPEC 07) para obtener `userId` del staff.
-  2. Valida nombre y email (regex de email existente en el modal).
+  2. Valida nombre y email con `isValidEmail` de `lib/link-parent.ts` (fuente única compartida con el modal).
   3. Genera código de 5 caracteres alfanuméricos en mayúsculas con alfabeto sin ambiguos (`ABCDEFGHJKLMNPQRSTUVWXYZ23456789`).
   4. Inserta en `invitations` con `expires_at = now() + 7 days`, `invited_by = userId`, vía `createServiceClient()`.
   5. Envía correo con Resend desde `onboarding@resend.dev` (sandbox) con el link `${INVITATION_URL}?code=<code>` y el código en el cuerpo.
@@ -32,7 +32,8 @@
 - **Reescritura de `LinkParentModal.tsx`:**
   - Se elimina la caja amarilla del código de invitación (el código ya no se muestra en la UI — solo viaja por email).
   - El `onSubmit` dispara el server action en lugar de la derivación local.
-  - Estados nuevos del form: `idle`, `submitting` (deshabilita el CTA y muestra spinner), `success` (cierra el modal), `error` (muestra mensaje inline debajo del CTA con los tokens `--color-input-error-text` existentes).
+  - El form usa `<form action={formAction}>` + `useActionState`; `onSubmit` solo actúa como guard de validación client con foco al campo con error (patrón de `ActivationForm`).
+  - `isPending` de `useActionState` deshabilita el CTA, muestra el spinner y bloquea el cierre del modal mientras envía; `error` del server state muestra mensaje inline debajo del CTA con los tokens `--color-input-error-text` existentes; `success` cierra el modal vía efecto (patrón de `AddChildForm`). El form se remonta en cada cierre (`key`), así cada apertura arranca limpia (patrón de `AddKidModal`).
   - La validación client se mantiene (nombre/email obligatorios, formato email) como feedback rápido; la validación server es la fuente de verdad.
   - Se eliminan las props `onSubmit` del padre; el modal ahora invoca el server action internamente.
 - **Email de invitación (Resend sandbox):**

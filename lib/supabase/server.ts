@@ -15,9 +15,15 @@ export async function createClient() {
           return parseCookieHeader(cookieStore.toString());
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options),
-          );
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options),
+            );
+          } catch {
+            // `setAll` ran inside a Server Component render, where cookies are
+            // read-only. Safe to ignore: proxy.ts refreshes the session on every
+            // request and writes the cookies for us.
+          }
         },
       },
     },

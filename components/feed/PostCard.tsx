@@ -64,7 +64,7 @@ const avatarStyles: Record<PostType, string> = {
   encouragement: "bg-encouragement-badge-bg text-encouragement-badge-fg",
 };
 
-type PostCardProps = {
+export type PostCardProps = {
   post: FeedPost;
 };
 
@@ -111,31 +111,35 @@ export function PostCard({ post }: PostCardProps) {
       <p className="text-[15.5px] leading-[1.55] text-ink-body">{post.body}</p>
 
       {post.photoPlaceholderLabel ? (
-        <a
-          href="#"
-          className="mt-[14px] flex h-[200px] flex-col items-center justify-center gap-2 rounded-2xl border-[1.5px] border-dashed border-photo-border bg-photo-bg text-muted-faint"
-        >
+        <div className="mt-[14px] flex h-[200px] flex-col items-center justify-center gap-2 rounded-2xl border-[1.5px] border-dashed border-photo-border bg-photo-bg text-muted-faint">
           <ImageIcon className="h-[30px] w-[30px]" />
           <span className="text-[13.5px]">{post.photoPlaceholderLabel}</span>
-        </a>
+        </div>
       ) : null}
 
+      {/* TODO(posts): migrate the counters and "Editar" to next/link once the
+          post detail and edit routes exist. */}
       <div className="mt-4 flex items-center gap-[18px] border-t border-line-soft pt-[14px]">
         <span className="flex items-center gap-[7px] text-[14px] font-bold text-accent">
           <HeartIcon className="h-[19px] w-[19px]" />
-          {post.likesCount}
+          <span className="sr-only">{post.likesCount} me gusta</span>
+          <span aria-hidden="true">{post.likesCount}</span>
         </span>
-        <a
-          href="#"
-          className="flex items-center gap-[7px] text-[14px] font-bold text-muted"
+        <button
+          type="button"
+          aria-label={`Comentarios: ${post.commentsCount}`}
+          className="flex cursor-pointer items-center gap-[7px] text-[14px] font-bold text-muted"
         >
           <CommentIcon className="h-[18px] w-[18px]" />
-          {post.commentsCount}
-        </a>
+          <span aria-hidden="true">{post.commentsCount}</span>
+        </button>
         <span className="flex-1" />
-        <a href="#" className="text-[14px] font-extrabold text-accent-strong">
+        <button
+          type="button"
+          className="cursor-pointer text-[14px] font-extrabold text-accent-strong"
+        >
           Editar
-        </a>
+        </button>
       </div>
     </article>
   );
