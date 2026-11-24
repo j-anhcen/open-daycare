@@ -19,18 +19,29 @@ export type ActivationPageData = {
   title: string;
   intro: string;
   invitedToLabel: string;
-  childLabel: string;
-  childInitial: string;
   codeLabel: string;
   emailLabel: string;
   passwordLabel: string;
+  passwordPlaceholder: string;
   consentLabel: string;
   submitLabel: string;
   loginQuestion: string;
   loginLinkLabel: string;
-  prefillCode: string;
-  prefillEmail: string;
-  prefillPassword: string;
+  errorMessages: {
+    passwordRequired: string;
+    passwordTooShort: string;
+    consentRequired: string;
+    emailAlreadyRegistered: string;
+    generic: string;
+  };
+  invalidInvitationData: {
+    title: string;
+    messages: {
+      invalid: string;
+      expired: string;
+      alreadyUsed: string;
+    };
+  };
 };
 
 // Copy mirrors references/pantallas/login.dc.html. The Personal/Familia
@@ -59,17 +70,28 @@ export const activationPageData: ActivationPageData = {
   intro:
     "Te invitaron a seguir el día de tu hijo. Creá tu contraseña para activar la cuenta.",
   invitedToLabel: "Te invitaron a seguir a",
-  childLabel: "Mateo · Sala Soles",
-  childInitial: "M",
   codeLabel: "CÓDIGO DE INVITACIÓN",
   emailLabel: "EMAIL",
   passwordLabel: "CREAR CONTRASEÑA",
+  passwordPlaceholder: "••••••••",
   consentLabel:
     "Autorizo a la guardería a tomar y compartir fotos de mi hijo dentro de la app.",
   submitLabel: "Activar mi cuenta",
   loginQuestion: "¿Ya tenés cuenta?",
   loginLinkLabel: "Iniciar sesión",
-  prefillCode: "7K4P9",
-  prefillEmail: "lucia.fernandez@gmail.com",
-  prefillPassword: "contraseña",
+  errorMessages: {
+    passwordRequired: "Ingresá una contraseña.",
+    passwordTooShort: "La contraseña debe tener al menos 6 caracteres.",
+    consentRequired: "Tenés que aceptar el consentimiento para continuar.",
+    emailAlreadyRegistered: "Ya existe una cuenta con este correo. Iniciá sesión.",
+    generic: "No se pudo activar la cuenta. Intentá de nuevo.",
+  },
+  invalidInvitationData: {
+    title: "Enlace inválido",
+    messages: {
+      invalid: "Esta invitación no es válida o fue cancelada.",
+      expired: "Esta invitación venció. Pedile a la guardería que te envíe una nueva.",
+      alreadyUsed: "Esta invitación ya fue utilizada. Ya podés iniciar sesión.",
+    },
+  },
 };
